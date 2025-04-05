@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { Web3Icon } from '@bgd-labs/react-web3-icons';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 interface Network {
   chainId: number;
   name: string;
   iconSymbol: string;
   shortName: string;
+  iconFileName?: string;
 }
 
 interface Token {
@@ -22,6 +24,8 @@ interface Token {
 
 interface TokenWithNetworks extends Token {
   networks: Network[];
+  balance?: string;
+  usdValue?: string;
 }
 
 interface TokenSelectorProps {
@@ -29,29 +33,161 @@ interface TokenSelectorProps {
   onClose: () => void;
   onSelect: (token: Token) => void;
   selectedToken?: Token;
+  onBalanceUpdate?: (balance: string, usdValue: string) => void;
 }
 
+// 常用代幣列表（按優先順序排序）
+const POPULAR_TOKENS = ['ETH', 'WETH', 'USDT', 'USDC', 'DAI', 'WBTC', 'BNB', 'MATIC'];
+
 const NETWORKS: Network[] = [
-  { chainId: 1, name: 'Ethereum', iconSymbol: 'ETH', shortName: 'ETH' },
-  { chainId: 10, name: 'Optimism', iconSymbol: 'OP', shortName: 'OP' },
-  { chainId: 42161, name: 'Arbitrum', iconSymbol: 'ARB', shortName: 'ARB' },
-  { chainId: 56, name: 'BNB Chain', iconSymbol: 'BNB', shortName: 'BSC' },
-  { chainId: 137, name: 'Polygon', iconSymbol: 'MATIC', shortName: 'MATIC' },
-  { chainId: 43114, name: 'Avalanche', iconSymbol: 'AVAX', shortName: 'AVAX' },
-  { chainId: 250, name: 'Fantom', iconSymbol: 'FTM', shortName: 'FTM' },
-  { chainId: 100, name: 'Gnosis', iconSymbol: 'XDAI', shortName: 'XDAI' },
-  { chainId: 1313161554, name: 'Aurora', iconSymbol: 'AURORA', shortName: 'AURORA' },
-  { chainId: 8217, name: 'Klaytn', iconSymbol: 'KLAY', shortName: 'KLAY' },
-  { chainId: 42220, name: 'Celo', iconSymbol: 'CELO', shortName: 'CELO' }
+  { 
+    chainId: 1, 
+    name: 'Ethereum', 
+    iconSymbol: 'ETH', 
+    shortName: 'ETH',
+    iconFileName: 'ethereum.svg'
+  },
+  { 
+    chainId: 10, 
+    name: 'Optimism', 
+    iconSymbol: 'OP', 
+    shortName: 'OP',
+    iconFileName: 'optimism.svg'
+  },
+  { 
+    chainId: 42161, 
+    name: 'Arbitrum', 
+    iconSymbol: 'ARB', 
+    shortName: 'ARB',
+    iconFileName: 'arbitrum.svg'
+  },
+  { 
+    chainId: 56, 
+    name: 'BNB Chain', 
+    iconSymbol: 'BNB', 
+    shortName: 'BSC',
+    iconFileName: 'bnb.svg'
+  },
+  { 
+    chainId: 137, 
+    name: 'Polygon', 
+    iconSymbol: 'MATIC', 
+    shortName: 'MATIC',
+    iconFileName: 'polygon.svg'
+  },
+  { 
+    chainId: 43114, 
+    name: 'Avalanche', 
+    iconSymbol: 'AVAX', 
+    shortName: 'AVAX',
+    iconFileName: 'avalanche.svg'
+  },
+  { 
+    chainId: 250, 
+    name: 'Fantom', 
+    iconSymbol: 'FTM', 
+    shortName: 'FTM',
+    iconFileName: 'fantom.svg'
+  },
+  { 
+    chainId: 100, 
+    name: 'Gnosis', 
+    iconSymbol: 'XDAI', 
+    shortName: 'XDAI',
+    iconFileName: 'gnosis.svg'
+  },
+  { 
+    chainId: 1313161554, 
+    name: 'Aurora', 
+    iconSymbol: 'AURORA', 
+    shortName: 'AURORA',
+    iconFileName: 'aurora.svg'
+  },
+  { 
+    chainId: 8217, 
+    name: 'Klaytn', 
+    iconSymbol: 'KLAY', 
+    shortName: 'KLAY',
+    iconFileName: 'klaytn.svg'
+  },
+  { 
+    chainId: 42220, 
+    name: 'Celo', 
+    iconSymbol: 'CELO', 
+    shortName: 'CELO',
+    iconFileName: 'celo.svg'
+  }
 ];
 
-export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken }: TokenSelectorProps) => {
+const NetworkIcon = ({ network }: { network: Network }) => {
+  const [fallbackError, setFallbackError] = useState(false);
+
+  if (!fallbackError) {
+    return (
+      <Web3Icon
+        symbol={network.iconSymbol}
+        className="w-full h-full"
+        onError={() => setFallbackError(true)}
+      />
+    );
+  }
+
+  return network.iconFileName ? (
+    <img
+      src={`https://app.1inch.io/assets/images/network-logos/${network.iconFileName}`}
+      alt={network.name}
+      className="w-full h-full"
+      onError={(e) => {
+        const target = e.target as HTMLImageElement;
+        target.src = 'https://via.placeholder.com/32?text=' + network.shortName.substring(0, 2);
+      }}
+    />
+  ) : (
+    <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium">
+      {network.shortName.substring(0, 2)}
+    </div>
+  );
+};
+
+export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken, onBalanceUpdate }: TokenSelectorProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [tokens, setTokens] = useState<TokenWithNetworks[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedTokenForNetwork, setSelectedTokenForNetwork] = useState<TokenWithNetworks | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  // 過濾代幣
+  const filteredTokens = useMemo(() => 
+    tokens.filter(token => 
+      token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      token.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
+    [tokens, searchQuery]
+  );
+
+  // 虛擬滾動設置
+  const rowVirtualizer = useVirtualizer({
+    count: filteredTokens.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 64, // 每個項目的預估高度
+    overscan: 5, // 預加載的項目數量
+  });
+
+  // 獲取代幣餘額
+  const fetchTokenBalance = async (token: Token) => {
+    try {
+      // 這裡應該調用您的合約或 API 來獲取餘額
+      // 這是一個示例實現
+      const balance = '1000'; // 模擬值
+      const usdValue = '1500'; // 模擬值
+      return { balance, usdValue };
+    } catch (err) {
+      console.error('Error fetching balance:', err);
+      return { balance: '0', usdValue: '0' };
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -79,15 +215,8 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken }: Toke
       const updatedNetworks = Array.from(availableChainIds).map(chainId => {
         const existingNetwork = NETWORKS.find(n => n.chainId === chainId);
         if (existingNetwork) return existingNetwork;
-        
-        // 如果是新的鏈，創建一個新的網路配置
-        return {
-          chainId: chainId as number,
-          name: `Chain ${chainId}`,
-          iconSymbol: 'ETH', // 默認圖示
-          shortName: `CHAIN${chainId}`
-        } as Network;
-      });
+        return null; // 如果找不到對應的網路配置，返回 null
+      }).filter((network): network is Network => network !== null);
       
       // 將代幣按照符號分組，合併不同鏈上的同一代幣
       const tokenMap = new Map<string, TokenWithNetworks>();
@@ -108,7 +237,26 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken }: Toke
         }
       });
       
-      setTokens(Array.from(tokenMap.values()));
+      // 將代幣轉換為數組並排序
+      const sortedTokens = Array.from(tokenMap.values()).sort((a, b) => {
+        // 檢查是否為常用代幣
+        const aPopularIndex = POPULAR_TOKENS.indexOf(a.symbol);
+        const bPopularIndex = POPULAR_TOKENS.indexOf(b.symbol);
+        
+        // 如果兩個都是常用代幣，按照常用代幣列表的順序排序
+        if (aPopularIndex !== -1 && bPopularIndex !== -1) {
+          return aPopularIndex - bPopularIndex;
+        }
+        
+        // 如果只有一個是常用代幣，將其排在前面
+        if (aPopularIndex !== -1) return -1;
+        if (bPopularIndex !== -1) return 1;
+        
+        // 如果都不是常用代幣，按照代幣符號字母順序排序
+        return a.symbol.localeCompare(b.symbol);
+      });
+      
+      setTokens(sortedTokens);
     } catch (err) {
       setError('無法載入代幣列表');
       console.error('Error fetching tokens:', err);
@@ -116,11 +264,6 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken }: Toke
       setLoading(false);
     }
   };
-
-  const filteredTokens = tokens.filter(token => 
-    token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    token.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const handleTokenClick = (token: TokenWithNetworks) => {
     if (token.networks.length === 1) {
@@ -138,6 +281,15 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken }: Toke
     });
     onClose();
   };
+
+  // 更新選中代幣的餘額
+  useEffect(() => {
+    if (selectedToken && onBalanceUpdate) {
+      fetchTokenBalance(selectedToken).then(({ balance, usdValue }) => {
+        onBalanceUpdate(balance, usdValue);
+      });
+    }
+  }, [selectedToken, onBalanceUpdate]);
 
   return (
     <AnimatePresence>
@@ -187,7 +339,15 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken }: Toke
             )}
 
             {/* 代幣列表或網路列表 */}
-            <div className="max-h-96 overflow-y-auto">
+            <div 
+              ref={parentRef}
+              className="max-h-96 overflow-y-auto"
+              style={{
+                height: '400px', // 固定高度以便虛擬滾動
+                width: '100%',
+                overflow: 'auto',
+              }}
+            >
               {loading ? (
                 <div className="p-4 text-center text-gray-500">載入中...</div>
               ) : error ? (
@@ -202,7 +362,7 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken }: Toke
                       className="w-full flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
                       <div className="w-6 h-6 mr-3">
-                        <Web3Icon symbol={network.iconSymbol} className="w-full h-full" />
+                        <NetworkIcon network={network} />
                       </div>
                       <div className="flex-1">
                         <div className="font-medium">{network.name}</div>
@@ -212,44 +372,76 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken }: Toke
                   ))}
                 </div>
               ) : (
-                // 代幣列表
-                <div className="space-y-2 p-4">
-                  {filteredTokens.map((token) => (
-                    <button
-                      key={token.symbol}
-                      onClick={() => handleTokenClick(token)}
-                      className="w-full flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                    >
-                      <div className="w-8 h-8 mr-3">
-                        {token.logoURI ? (
-                          <img
-                            src={token.logoURI}
-                            alt={token.symbol}
-                            className="w-full h-full rounded-full"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = 'https://via.placeholder.com/32?text=' + token.symbol.substring(0, 2);
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium">
-                            {token.symbol.substring(0, 2)}
+                // 代幣列表 - 使用虛擬滾動
+                <div
+                  style={{
+                    height: `${rowVirtualizer.getTotalSize()}px`,
+                    width: '100%',
+                    position: 'relative',
+                  }}
+                >
+                  {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                    const token = filteredTokens[virtualRow.index];
+                    return (
+                      <div
+                        key={token.symbol}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: `${virtualRow.size}px`,
+                          transform: `translateY(${virtualRow.start}px)`,
+                        }}
+                      >
+                        <button
+                          onClick={() => handleTokenClick(token)}
+                          className="w-full flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        >
+                          <div className="w-8 h-8 mr-3">
+                            {token.logoURI ? (
+                              <img
+                                src={token.logoURI}
+                                alt={token.symbol}
+                                className="w-full h-full rounded-full"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = 'https://via.placeholder.com/32?text=' + token.symbol.substring(0, 2);
+                                }}
+                              />
+                            ) : (
+                              <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium">
+                                {token.symbol.substring(0, 2)}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium">{token.symbol}</div>
-                        <div className="text-sm text-gray-500">{token.name}</div>
-                      </div>
-                      <div className="flex gap-1">
-                        {token.networks.map(network => (
-                          <div key={network.chainId} title={network.name} className="w-5 h-5">
-                            <Web3Icon symbol={network.iconSymbol} className="w-full h-full" />
+                          <div className="flex-1">
+                            <div className="font-medium">{token.symbol}</div>
+                            <div className="text-sm text-gray-500">{token.name}</div>
                           </div>
-                        ))}
+                          <div className="flex flex-col items-end">
+                            {token.balance && (
+                              <div className="text-sm font-medium">
+                                {token.balance} {token.symbol}
+                              </div>
+                            )}
+                            {token.usdValue && (
+                              <div className="text-xs text-gray-500">
+                                ≈ ${token.usdValue}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex gap-1 ml-2">
+                            {token.networks.map(network => (
+                              <div key={network.chainId} title={network.name} className="w-5 h-5">
+                                <NetworkIcon network={network} />
+                              </div>
+                            ))}
+                          </div>
+                        </button>
                       </div>
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { Web3Icon } from '@bgd-labs/react-web3-icons';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { useAccount } from 'wagmi';
+import { formatUnits } from 'viem';
 
 interface Network {
   chainId: number;
@@ -24,8 +26,6 @@ interface Token {
 
 interface TokenWithNetworks extends Token {
   networks: Network[];
-  balance?: string;
-  usdValue?: string;
 }
 
 interface TokenSelectorProps {
@@ -33,7 +33,6 @@ interface TokenSelectorProps {
   onClose: () => void;
   onSelect: (token: Token) => void;
   selectedToken?: Token;
-  onBalanceUpdate?: (balance: string, usdValue: string) => void;
 }
 
 // 常用代幣列表（按優先順序排序）
@@ -149,14 +148,23 @@ const NetworkIcon = ({ network }: { network: Network }) => {
   );
 };
 
-export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken, onBalanceUpdate }: TokenSelectorProps) => {
+export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken }: TokenSelectorProps) => {
+  const { address: userAddress } = useAccount();
   const [searchQuery, setSearchQuery] = useState('');
   const [tokens, setTokens] = useState<TokenWithNetworks[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedTokenForNetwork, setSelectedTokenForNetwork] = useState<TokenWithNetworks | null>(null);
+  const [displayedToken, setDisplayedToken] = useState<Token | undefined>(selectedToken);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const parentRef = useRef<HTMLDivElement>(null);
+
+  // 當 selectedToken 改變時更新 displayedToken
+  useEffect(() => {
+    if (selectedToken) {
+      setDisplayedToken(selectedToken);
+    }
+  }, [selectedToken]);
 
   // 過濾代幣
   const filteredTokens = useMemo(() => 
@@ -174,20 +182,6 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken, onBala
     estimateSize: () => 64, // 每個項目的預估高度
     overscan: 5, // 預加載的項目數量
   });
-
-  // 獲取代幣餘額
-  const fetchTokenBalance = async (token: Token) => {
-    try {
-      // 這裡應該調用您的合約或 API 來獲取餘額
-      // 這是一個示例實現
-      const balance = '1000'; // 模擬值
-      const usdValue = '1500'; // 模擬值
-      return { balance, usdValue };
-    } catch (err) {
-      console.error('Error fetching balance:', err);
-      return { balance: '0', usdValue: '0' };
-    }
-  };
 
   useEffect(() => {
     if (isOpen) {
@@ -267,7 +261,9 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken, onBala
 
   const handleTokenClick = (token: TokenWithNetworks) => {
     if (token.networks.length === 1) {
-      onSelect({ ...token, chainId: token.networks[0].chainId });
+      const selectedToken = { ...token, chainId: token.networks[0].chainId };
+      setDisplayedToken(selectedToken);
+      onSelect(selectedToken);
       onClose();
     } else {
       setSelectedTokenForNetwork(token);
@@ -275,21 +271,14 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken, onBala
   };
 
   const handleNetworkSelect = (token: TokenWithNetworks, network: Network) => {
-    onSelect({
+    const selectedToken = {
       ...token,
       chainId: network.chainId
-    });
+    };
+    setDisplayedToken(selectedToken);
+    onSelect(selectedToken);
     onClose();
   };
-
-  // 更新選中代幣的餘額
-  useEffect(() => {
-    if (selectedToken && onBalanceUpdate) {
-      fetchTokenBalance(selectedToken).then(({ balance, usdValue }) => {
-        onBalanceUpdate(balance, usdValue);
-      });
-    }
-  }, [selectedToken, onBalanceUpdate]);
 
   return (
     <AnimatePresence>
@@ -343,7 +332,7 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken, onBala
               ref={parentRef}
               className="max-h-96 overflow-y-auto"
               style={{
-                height: '400px', // 固定高度以便虛擬滾動
+                height: '400px',
                 width: '100%',
                 overflow: 'auto',
               }}
@@ -372,7 +361,7 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken, onBala
                   ))}
                 </div>
               ) : (
-                // 代幣列表 - 使用虛擬滾動
+                // 代幣列表
                 <div
                   style={{
                     height: `${rowVirtualizer.getTotalSize()}px`,
@@ -398,7 +387,7 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken, onBala
                           onClick={() => handleTokenClick(token)}
                           className="w-full flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                         >
-                          <div className="w-8 h-8 mr-3">
+                          <div className="w-8 h-8 mr-3 flex-shrink-0">
                             {token.logoURI ? (
                               <img
                                 src={token.logoURI}
@@ -415,23 +404,19 @@ export const TokenSelector = ({ isOpen, onClose, onSelect, selectedToken, onBala
                               </div>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <div className="font-medium">{token.symbol}</div>
-                            <div className="text-sm text-gray-500">{token.name}</div>
+                          <div className="min-w-[120px] mr-4">
+                            <div className="font-medium text-left">{token.symbol}</div>
+                            <div className="text-sm text-gray-500 text-left truncate">
+                              {token.name}
+                              {displayedToken && token.symbol === displayedToken.symbol && (
+                                <span className="ml-1 text-primary-500">
+                                  on {NETWORKS.find(n => n.chainId === displayedToken.chainId)?.name}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex flex-col items-end">
-                            {token.balance && (
-                              <div className="text-sm font-medium">
-                                {token.balance} {token.symbol}
-                              </div>
-                            )}
-                            {token.usdValue && (
-                              <div className="text-xs text-gray-500">
-                                ≈ ${token.usdValue}
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex gap-1 ml-2">
+                          <div className="flex-1" />
+                          <div className="flex gap-1 flex-shrink-0">
                             {token.networks.map(network => (
                               <div key={network.chainId} title={network.name} className="w-5 h-5">
                                 <NetworkIcon network={network} />

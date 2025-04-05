@@ -30,6 +30,19 @@ const MOCK_NFT = {
   ]
 };
 
+// 模擬贊助者 NFT 元數據
+const MOCK_SUPPORTER_NFT = {
+  name: "CreatorsHub 支持者 NFT",
+  description: "這是一個代表 CreatorsHub 支持者身份的 NFT，持有者可以獲得平台上的特殊權益。",
+  image: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
+  attributes: [
+    { trait_type: "等級", value: "支持者" },
+    { trait_type: "贊助日期", value: new Date().toLocaleDateString() },
+    { trait_type: "贊助金額", value: "0 ETH" },
+    { trait_type: "支持創作者", value: "未指定" }
+  ]
+};
+
 const NETWORKS = [
   { chainId: 1, name: 'Ethereum', iconSymbol: 'ETH', shortName: 'ETH' },
   { chainId: 10, name: 'Optimism', iconSymbol: 'OP', shortName: 'OP' },
@@ -50,7 +63,10 @@ export const Donate = () => {
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [creatorInfo, setCreatorInfo] = useState<{ name: string; bio: string } | null>(null);
   const [nftMetadata, setNftMetadata] = useState<any>(null);
+  const [supporterNftMetadata, setSupporterNftMetadata] = useState<any>(null);
   const [isLoadingNft, setIsLoadingNft] = useState(false);
+  const [isLoadingSupporterNft, setIsLoadingSupporterNft] = useState(false);
+  const [showSupporterNft, setShowSupporterNft] = useState(false);
 
   const { address } = useAccount();
   const { data: balance } = useBalance({
@@ -146,6 +162,37 @@ export const Donate = () => {
     }
   }, [balance]);
 
+  // 更新贊助者 NFT 元數據
+  useEffect(() => {
+    if (amount && selectedToken && creatorInfo) {
+      setIsLoadingSupporterNft(true);
+      
+      // 模擬 API 延遲
+      setTimeout(() => {
+        const updatedNft = {
+          ...MOCK_SUPPORTER_NFT,
+          attributes: [
+            { trait_type: "等級", value: getSupporterTier(parseFloat(amount)) },
+            { trait_type: "贊助日期", value: new Date().toLocaleDateString() },
+            { trait_type: "贊助金額", value: `${amount} ${selectedToken.symbol}` },
+            { trait_type: "支持創作者", value: creatorInfo.name }
+          ]
+        };
+        
+        setSupporterNftMetadata(updatedNft);
+        setIsLoadingSupporterNft(false);
+      }, 1000);
+    }
+  }, [amount, selectedToken, creatorInfo]);
+
+  // 根據贊助金額獲取支持者等級
+  const getSupporterTier = (amount: number) => {
+    if (amount >= 0.1) return "鑽石支持者";
+    if (amount >= 0.05) return "黃金支持者";
+    if (amount >= 0.01) return "白銀支持者";
+    return "銅牌支持者";
+  };
+
   const suggestedAmounts = [
     { value: '0.01', label: '0.01 ETH', tier: '銅牌贊助' },
     { value: '0.05', label: '0.05 ETH', tier: '銀牌贊助' },
@@ -201,41 +248,102 @@ export const Donate = () => {
           className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
         >
           <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">創作者 NFT</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">NFT 預覽</h2>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setShowSupporterNft(false)}
+                  className={`px-3 py-1 rounded-lg text-sm ${
+                    !showSupporterNft
+                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
+                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  創作者 NFT
+                </button>
+                <button
+                  onClick={() => setShowSupporterNft(true)}
+                  className={`px-3 py-1 rounded-lg text-sm ${
+                    showSupporterNft
+                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
+                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  支持者 NFT
+                </button>
+              </div>
+            </div>
             
-            {isLoadingNft ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
-                <p className="text-gray-600 dark:text-gray-400">載入 NFT 資料中...</p>
-              </div>
-            ) : nftMetadata ? (
-              <div className="space-y-4">
-                <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
-                  <img 
-                    src={nftMetadata.image} 
-                    alt={nftMetadata.name}
-                    className="w-full h-full object-cover"
-                  />
+            {!showSupporterNft ? (
+              isLoadingNft ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
+                  <p className="text-gray-600 dark:text-gray-400">載入 NFT 資料中...</p>
                 </div>
-                
-                <div>
-                  <h3 className="text-xl font-bold">{nftMetadata.name}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 mt-1">{nftMetadata.description}</p>
+              ) : nftMetadata ? (
+                <div className="space-y-4">
+                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                    <img 
+                      src={nftMetadata.image} 
+                      alt={nftMetadata.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-xl font-bold">{nftMetadata.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">{nftMetadata.description}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    {nftMetadata.attributes.map((attr: any, index: number) => (
+                      <div key={index} className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{attr.trait_type}</p>
+                        <p className="font-medium">{attr.value}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  {nftMetadata.attributes.map((attr: any, index: number) => (
-                    <div key={index} className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{attr.trait_type}</p>
-                      <p className="font-medium">{attr.value}</p>
-                    </div>
-                  ))}
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-600 dark:text-gray-400">無法載入 NFT 資料</p>
                 </div>
-              </div>
+              )
             ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-600 dark:text-gray-400">無法載入 NFT 資料</p>
-              </div>
+              isLoadingSupporterNft ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
+                  <p className="text-gray-600 dark:text-gray-400">載入支持者 NFT 資料中...</p>
+                </div>
+              ) : supporterNftMetadata ? (
+                <div className="space-y-4">
+                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                    <img 
+                      src={supporterNftMetadata.image} 
+                      alt={supporterNftMetadata.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-xl font-bold">{supporterNftMetadata.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">{supporterNftMetadata.description}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    {supporterNftMetadata.attributes.map((attr: any, index: number) => (
+                      <div key={index} className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{attr.trait_type}</p>
+                        <p className="font-medium">{attr.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-600 dark:text-gray-400">請輸入贊助金額以預覽您的 NFT</p>
+                </div>
+              )
             )}
           </div>
         </motion.div>

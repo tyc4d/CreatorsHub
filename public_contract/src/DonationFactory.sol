@@ -4,7 +4,6 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "./interfaces/IDonationContract.sol";
 import "./DonationContract.sol";
 import "./CreatorNFT.sol";
@@ -15,8 +14,6 @@ import "./SupporterNFT.sol";
  * @dev 作為整個系統的入口點，負責創建新的捐贈合約和鑄造創作者 NFT
  */
 contract DonationFactory is Ownable {
-    using Counters for Counters.Counter;
-
     // 事件定義
     event DonationContractCreated(
         address indexed creator,
@@ -38,7 +35,6 @@ contract DonationFactory is Ownable {
     );
 
     // 狀態變量
-    Counters.Counter private _tokenIds;
     mapping(address => bool) public isCreator;
     mapping(address => address) public creatorToContract;
     mapping(address => uint256) public creatorToNFTId;

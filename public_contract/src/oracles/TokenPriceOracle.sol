@@ -2,13 +2,12 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
  * @title TokenPriceOracle
  * @dev 實現代幣價格查詢和更新機制
  */
-contract TokenPriceOracle is Ownable, ReentrancyGuard {
+contract TokenPriceOracle is Ownable {
     // 事件定義
     event PriceUpdated(address indexed token, uint256 price, uint256 timestamp);
     event OracleAdded(address indexed oracle, string name);

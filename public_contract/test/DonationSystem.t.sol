@@ -13,6 +13,12 @@ import "../src/interfaces/ITokenPriceOracle.sol";
  * @dev 測試整個捐贈系統的功能
  */
 contract DonationSystemTest is Test {
+    // 事件定義
+    event DonationContractCreated(address indexed creator, address contractAddress, string name, string description);
+    event DonationReceived(address indexed supporter, uint256 amount, uint256 usdValue, uint256 timestamp);
+    event SupporterNFTMinted(address indexed supporter, address indexed creator, uint256 tokenId, uint256 amount);
+    event WithdrawalProcessed(address indexed creator, uint256 amount, uint256 timestamp);
+
     // 合約實例
     DonationFactory public factory;
     DonationContract public donationContractTemplate;
@@ -287,14 +293,15 @@ contract DonationSystemTest is Test {
  * @dev 模擬價格預言機合約
  */
 contract MockTokenPriceOracle is ITokenPriceOracle {
-    // 模擬 ETH 價格 (2000 USD)
-    uint256 public constant ETH_PRICE = 2000 * 1e18;
-    
     function getPrice(address token) external pure returns (uint256) {
-        // 只返回 ETH 價格
-        if (token == 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2) {
-            return ETH_PRICE;
-        }
-        return 0;
+        return 2000 * 1e18; // 固定價格：2000 USD
+    }
+
+    function getPriceWithTimestamp(address token) external view returns (uint256 price, uint256 lastUpdate) {
+        return (2000 * 1e18, block.timestamp);
+    }
+
+    function isPriceValid(address token) external pure returns (bool) {
+        return true;
     }
 } 

@@ -4,14 +4,17 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title SupporterNFT
  * @dev 實現支持者 NFT，用於記錄支持者的捐贈歷史
  */
 contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
-    using Counters for Counters.Counter;
+    // 狀態變量
+    uint256 private _nextTokenId;
+    mapping(uint256 => SupporterMetadata) private _supporterMetadata;
+    mapping(address => mapping(address => uint256)) public supporterToCreatorTokenId;
+    mapping(uint256 => bool) private _tokenExists;
 
     // 事件定義
     event SupporterNFTMinted(
@@ -28,11 +31,6 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
         uint256 timestamp
     );
 
-    // 狀態變量
-    Counters.Counter private _tokenIds;
-    mapping(uint256 => SupporterMetadata) private _supporterMetadata;
-    mapping(address => mapping(address => uint256)) public supporterToCreatorTokenId;
-
     // 支持者資訊結構
     struct SupporterMetadata {
         address supporter;    // 支持者地址
@@ -43,6 +41,15 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
     }
 
     constructor() ERC721("CreatorsHub Supporter NFT", "CSNFT") Ownable(msg.sender) {}
+
+    /**
+     * @dev 檢查代幣是否存在
+     * @param tokenId 代幣 ID
+     * @return 代幣是否存在
+     */
+    function _exists(uint256 tokenId) internal view returns (bool) {
+        return _tokenExists[tokenId];
+    }
 
     /**
      * @dev 鑄造支持者 NFT
@@ -64,11 +71,10 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
         require(_creator != address(0), "Invalid creator address");
         require(_amount > 0, "Amount must be greater than 0");
         
-        _tokenIds.increment();
-        uint256 newTokenId = _tokenIds.current();
+        uint256 tokenId = ++_nextTokenId;
         
         // 創建支持者元數據
-        _supporterMetadata[newTokenId] = SupporterMetadata({
+        _supporterMetadata[tokenId] = SupporterMetadata({
             supporter: _supporter,
             creator: _creator,
             amount: _amount,
@@ -77,18 +83,19 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
         });
         
         // 鑄造 NFT
-        _safeMint(_supporter, newTokenId);
-        supporterToCreatorTokenId[_supporter][_creator] = newTokenId;
+        _safeMint(_supporter, tokenId);
+        supporterToCreatorTokenId[_supporter][_creator] = tokenId;
+        _tokenExists[tokenId] = true;
         
         emit SupporterNFTMinted(
             _supporter,
             _creator,
-            newTokenId,
+            tokenId,
             _amount,
             _timestamp
         );
         
-        return newTokenId;
+        return tokenId;
     }
 
     /**

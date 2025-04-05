@@ -4,14 +4,17 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title CreatorNFT
  * @dev 實現創作者身份驗證和權益管理
  */
 contract CreatorNFT is ERC721, ERC721URIStorage, Ownable {
-    using Counters for Counters.Counter;
+    // 狀態變量
+    uint256 private _nextTokenId;
+    mapping(uint256 => CreatorMetadata) private _creatorMetadata;
+    mapping(address => uint256) public creatorToTokenId;
+    mapping(uint256 => bool) private _tokenExists;
 
     // 事件定義
     event CreatorNFTMinted(
@@ -35,11 +38,6 @@ contract CreatorNFT is ERC721, ERC721URIStorage, Ownable {
         uint256 timestamp
     );
 
-    // 狀態變量
-    Counters.Counter private _tokenIds;
-    mapping(uint256 => CreatorMetadata) private _creatorMetadata;
-    mapping(address => uint256) public creatorToTokenId;
-
     // 創作者資訊結構
     struct CreatorMetadata {
         string name;          // 創作者名稱
@@ -53,6 +51,15 @@ contract CreatorNFT is ERC721, ERC721URIStorage, Ownable {
     }
 
     constructor() ERC721("CreatorsHub Creator NFT", "CCNFT") Ownable(msg.sender) {}
+
+    /**
+     * @dev 檢查代幣是否存在
+     * @param tokenId 代幣 ID
+     * @return 代幣是否存在
+     */
+    function _exists(uint256 tokenId) internal view returns (bool) {
+        return _tokenExists[tokenId];
+    }
 
     /**
      * @dev 鑄造創作者 NFT
@@ -69,11 +76,10 @@ contract CreatorNFT is ERC721, ERC721URIStorage, Ownable {
         require(_creator != address(0), "Invalid creator address");
         require(creatorToTokenId[_creator] == 0, "NFT already minted");
         
-        _tokenIds.increment();
-        uint256 newTokenId = _tokenIds.current();
+        uint256 tokenId = ++_nextTokenId;
         
         // 創建創作者元數據
-        _creatorMetadata[newTokenId] = CreatorMetadata({
+        _creatorMetadata[tokenId] = CreatorMetadata({
             name: _name,
             description: _description,
             image: "",
@@ -85,18 +91,19 @@ contract CreatorNFT is ERC721, ERC721URIStorage, Ownable {
         });
         
         // 鑄造 NFT
-        _safeMint(_creator, newTokenId);
-        creatorToTokenId[_creator] = newTokenId;
+        _safeMint(_creator, tokenId);
+        creatorToTokenId[_creator] = tokenId;
+        _tokenExists[tokenId] = true;
         
         emit CreatorNFTMinted(
             _creator,
-            newTokenId,
+            tokenId,
             _name,
             _description,
             block.timestamp
         );
         
-        return newTokenId;
+        return tokenId;
     }
 
     /**

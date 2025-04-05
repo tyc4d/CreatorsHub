@@ -54,7 +54,7 @@ contract DonationContract is Ownable {
     /**
      * @dev 接收捐贈
      */
-    function donate() external payable {
+    function donate() public payable {
         require(initialized, "Not initialized");
         require(msg.value > 0, "Amount must be greater than 0");
         

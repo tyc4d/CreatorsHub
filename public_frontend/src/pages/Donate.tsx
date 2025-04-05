@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { SwapModal } from '../components/SwapModal';
 import { TokenSelector } from '../components/TokenSelector';
-import { FaChevronDown } from 'react-icons/fa';
+import { FaChevronDown, FaEthereum } from 'react-icons/fa';
 import { useAccount, useBalance } from 'wagmi';
 import { formatUnits } from 'viem';
 import { useParams } from 'react-router-dom';
@@ -16,6 +16,19 @@ interface Token {
   logoURI: string;
   tags: string[];
 }
+
+// 模擬 NFT 元數據
+const MOCK_NFT = {
+  name: "CreatorsHub 創作者 NFT",
+  description: "這是一個代表 CreatorsHub 創作者身份的 NFT，持有者可以獲得平台上的特殊權益。",
+  image: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
+  attributes: [
+    { trait_type: "等級", value: "黃金" },
+    { trait_type: "加入日期", value: "2023-06-15" },
+    { trait_type: "贊助總額", value: "1.5 ETH" },
+    { trait_type: "支持者數量", value: "42" }
+  ]
+};
 
 const NETWORKS = [
   { chainId: 1, name: 'Ethereum', iconSymbol: 'ETH', shortName: 'ETH' },
@@ -36,6 +49,8 @@ export const Donate = () => {
   const [usdValue, setUsdValue] = useState<string>('0');
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [creatorInfo, setCreatorInfo] = useState<{ name: string; bio: string } | null>(null);
+  const [nftMetadata, setNftMetadata] = useState<any>(null);
+  const [isLoadingNft, setIsLoadingNft] = useState(false);
 
   const { address } = useAccount();
   const { data: balance } = useBalance({
@@ -63,6 +78,29 @@ export const Donate = () => {
     };
 
     fetchCreatorInfo();
+  }, [creatorAddress]);
+
+  // 獲取 NFT 元數據
+  useEffect(() => {
+    const fetchNftMetadata = async () => {
+      if (!creatorAddress) return;
+      
+      setIsLoadingNft(true);
+      try {
+        // 模擬 API 延遲
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // 這裡應該從 API 獲取 NFT 元數據
+        // 目前使用模擬數據
+        setNftMetadata(MOCK_NFT);
+      } catch (error) {
+        console.error('Error fetching NFT metadata:', error);
+      } finally {
+        setIsLoadingNft(false);
+      }
+    };
+
+    fetchNftMetadata();
   }, [creatorAddress]);
 
   // 獲取代幣 USD 價格
@@ -154,145 +192,145 @@ export const Donate = () => {
         )}
       </div>
 
-      <div className="flex justify-center w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* NFT 顯示區域 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-2xl"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
         >
-          <div className="space-y-8">
-            <div className="card space-y-8">
-              {/* 創作者信息 */}
-              <div className="creator-card">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center">
-                  <span className="text-xl sm:text-2xl text-white">C</span>
-                </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold mb-1">創作者名稱</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">0x1234...5678</p>
-                </div>
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">創作者 NFT</h2>
+            
+            {isLoadingNft ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
+                <p className="text-gray-600 dark:text-gray-400">載入 NFT 資料中...</p>
               </div>
-
-              {/* 捐贈金額選擇 */}
+            ) : nftMetadata ? (
               <div className="space-y-4">
-                <label className="block text-lg font-medium mb-2">選擇贊助金額</label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {suggestedAmounts.map((suggestion) => (
-                    <button
-                      key={suggestion.value}
-                      onClick={() => setAmount(suggestion.value)}
-                      className={`amount-button flex flex-col items-center ${
-                        amount === suggestion.value ? 'ring-2 ring-primary-500' : ''
-                      }`}
-                    >
-                      <span className="text-lg font-medium">{suggestion.label}</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {suggestion.tier}
-                      </span>
-                    </button>
+                <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                  <img 
+                    src={nftMetadata.image} 
+                    alt={nftMetadata.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-bold">{nftMetadata.name}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">{nftMetadata.description}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  {nftMetadata.attributes.map((attr: any, index: number) => (
+                    <div key={index} className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{attr.trait_type}</p>
+                      <p className="font-medium">{attr.value}</p>
+                    </div>
                   ))}
                 </div>
-                <div className="relative mt-4">
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="自訂金額"
-                    className="input pr-16"
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <span className="text-gray-500">{selectedToken?.symbol || 'ETH'}</span>
-                  </div>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-600 dark:text-gray-400">無法載入 NFT 資料</p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* 贊助表單區域 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
+        >
+          <h2 className="text-2xl font-bold mb-6">贊助表單</h2>
+          
+          <div className="space-y-6">
+            {/* 金額輸入 */}
+            <div>
+              <label className="block text-sm font-medium mb-2">贊助金額</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="輸入金額"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <span className="text-gray-500">{selectedToken?.symbol || 'ETH'}</span>
                 </div>
               </div>
-
-              {/* 代幣選擇 */}
-              <div className="space-y-4">
-                <label className="block text-lg font-medium mb-2">選擇代幣</label>
-                <div className="space-y-2">
+              
+              {/* 快速金額選擇 */}
+              <div className="grid grid-cols-3 gap-2 mt-2">
+                {suggestedAmounts.map((suggestion) => (
                   <button
-                    onClick={() => setIsTokenSelectorOpen(true)}
-                    className="w-full p-3 flex items-center justify-between border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    key={suggestion.value}
+                    onClick={() => setAmount(suggestion.value)}
+                    className={`py-2 text-sm rounded-lg border ${
+                      amount === suggestion.value
+                        ? 'bg-primary-50 border-primary-500 text-primary-700 dark:bg-primary-900/20 dark:border-primary-500 dark:text-primary-400'
+                        : 'border-gray-200 hover:border-primary-200 dark:border-gray-700'
+                    }`}
                   >
-                    <div className="flex items-center">
-                      {selectedToken ? (
-                        <>
-                          <div className="w-8 h-8 mr-3">
-                            {selectedToken.logoURI ? (
-                              <img
-                                src={selectedToken.logoURI}
-                                alt={selectedToken.symbol}
-                                className="w-full h-full rounded-full"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.src = 'https://via.placeholder.com/32?text=' + selectedToken.symbol.substring(0, 2);
-                                }}
-                              />
-                            ) : (
-                              <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium">
-                                {selectedToken.symbol.substring(0, 2)}
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <div className="font-medium">{selectedToken.symbol}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {selectedToken.name}
-                              {selectedToken.chainId && (
-                                <span className="ml-1 text-primary-500">
-                                  on {NETWORKS.find(n => n.chainId === selectedToken.chainId)?.name || 'Unknown Network'}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 mr-3 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                            <span className="text-xs font-medium">ETH</span>
-                          </div>
-                          <div>
-                            <div className="font-medium">ETH</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Ethereum</div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <FaChevronDown className="text-gray-400" />
+                    {suggestion.label}
                   </button>
-                  
-                  {/* 餘額和 USD 價值顯示 */}
-                  {selectedToken && (
-                    <div className="flex justify-between items-center px-3 text-sm text-gray-500 dark:text-gray-400">
-                      <div className="flex items-center space-x-2">
-                        <span>餘額:</span>
-                        {isLoadingBalance ? (
-                          <span className="animate-pulse">載入中...</span>
-                        ) : (
-                          <span>{Number(tokenBalance).toFixed(6)} {selectedToken.symbol}</span>
-                        )}
-                      </div>
-                      <div>
-                        {isLoadingBalance ? (
-                          <span className="animate-pulse">載入中...</span>
-                        ) : (
-                          <span>≈ ${(Number(tokenBalance) * Number(usdValue)).toFixed(2)} USD</span>
-                        )}
-                      </div>
-                    </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* 代幣選擇 */}
+            <div>
+              <label className="block text-sm font-medium mb-2">選擇代幣</label>
+              <button
+                onClick={() => setIsTokenSelectorOpen(true)}
+                className="w-full px-4 py-3 border rounded-lg flex items-center justify-between hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
+              >
+                <div className="flex items-center">
+                  {selectedToken ? (
+                    <>
+                      <img
+                        src={selectedToken.logoURI}
+                        alt={selectedToken.symbol}
+                        className="w-6 h-6 mr-2"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://via.placeholder.com/24?text=' + selectedToken.symbol.substring(0, 2);
+                        }}
+                      />
+                      <span>{selectedToken.symbol}</span>
+                    </>
+                  ) : (
+                    <>
+                      <FaEthereum className="w-6 h-6 mr-2 text-primary-500" />
+                      <span>ETH</span>
+                    </>
                   )}
                 </div>
-              </div>
-
-              {/* 捐贈按鈕 */}
-              <button 
-                onClick={handleDonateClick}
-                className="btn btn-primary w-full text-lg py-4"
-              >
-                確認贊助
+                <FaChevronDown className="text-gray-400" />
               </button>
+              
+              {/* 餘額顯示 */}
+              {selectedToken && (
+                <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex justify-between">
+                  <span>餘額: {isLoadingBalance ? '載入中...' : `${tokenBalance} ${selectedToken.symbol}`}</span>
+                  <span>≈ ${isLoadingBalance ? '載入中...' : (parseFloat(tokenBalance) * parseFloat(usdValue)).toFixed(2)} USD</span>
+                </div>
+              )}
             </div>
+            
+            {/* 贊助按鈕 */}
+            <button
+              onClick={handleDonateClick}
+              className="w-full py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              贊助
+            </button>
           </div>
         </motion.div>
       </div>
@@ -313,7 +351,7 @@ export const Donate = () => {
       <TokenSelector
         isOpen={isTokenSelectorOpen}
         onClose={() => setIsTokenSelectorOpen(false)}
-        onSelect={setSelectedToken}
+        onSelect={handleTokenSelect}
         selectedToken={selectedToken}
       />
     </div>

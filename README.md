@@ -9,7 +9,6 @@ Project management
 - [ ] Git ignore 
 - [ ] Branches
     - [ ] Main
-    - [ ] Hook Call
     - [ ] NFT Mint - Supporter and Creator
     - [ ] Gallery Frontend - Supporter 
     - [ ] Supporter Donation - Frontend

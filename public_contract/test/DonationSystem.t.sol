@@ -87,7 +87,7 @@ contract DonationSystemTest is Test {
         assertTrue(tokenId > 0, "Creator NFT should be minted");
         
         // 驗證創作者資訊
-        (string memory image, uint256 joinDate, bool isActive) = factory.getCreatorInfo(creator);
+        (string memory image, , bool isActive) = factory.getCreatorInfo(creator);
         assertEq(image, channelImage, "Channel image should be set");
         assertTrue(isActive, "Creator should be active");
     }
@@ -183,7 +183,7 @@ contract DonationSystemTest is Test {
     function testCreatorNFTUpdate() public {
         // 註冊創作者
         vm.startPrank(creator);
-        address contractAddress = factory.registerCreator(channelImage);
+        factory.registerCreator(channelImage);
         vm.stopPrank();
         
         // 獲取創作者 NFT ID
@@ -206,7 +206,7 @@ contract DonationSystemTest is Test {
     function testCreatorTierUpdate() public {
         // 註冊創作者
         vm.startPrank(creator);
-        address contractAddress = factory.registerCreator(channelImage);
+        factory.registerCreator(channelImage);
         vm.stopPrank();
         
         // 獲取創作者 NFT ID
@@ -286,15 +286,15 @@ contract DonationSystemTest is Test {
  * @dev 模擬價格預言機合約
  */
 contract MockTokenPriceOracle is ITokenPriceOracle {
-    function getPrice(address token) external pure returns (uint256) {
+    function getPrice(address) external pure returns (uint256) {
         return 2000 * 1e18; // 固定價格：2000 USD
     }
 
-    function getPriceWithTimestamp(address token) external view returns (uint256 price, uint256 lastUpdate) {
+    function getPriceWithTimestamp(address) external view returns (uint256 price, uint256 lastUpdate) {
         return (2000 * 1e18, block.timestamp);
     }
 
-    function isPriceValid(address token) external pure returns (bool) {
+    function isPriceValid(address) external pure returns (bool) {
         return true;
     }
 } 

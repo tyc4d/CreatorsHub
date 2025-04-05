@@ -1,15 +1,30 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { SwapModal } from '../components/SwapModal';
 
 export const Donate = () => {
   const [amount, setAmount] = useState('');
   const [selectedToken, setSelectedToken] = useState('ETH');
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
 
   const suggestedAmounts = [
     { value: '0.01', label: '0.01 ETH', tier: '銅牌贊助' },
     { value: '0.05', label: '0.05 ETH', tier: '銀牌贊助' },
     { value: '0.1', label: '0.1 ETH', tier: '金牌贊助' },
   ];
+
+  const handleDonateClick = () => {
+    if (!amount) {
+      alert('請輸入贊助金額');
+      return;
+    }
+    setIsSwapModalOpen(true);
+  };
+
+  const handleSwapConfirm = () => {
+    // 這裡將來會處理實際的交易邏輯
+    console.log('交易確認', { amount, selectedToken });
+  };
 
   return (
     <div className="flex justify-center w-full">
@@ -65,7 +80,7 @@ export const Donate = () => {
                   className="input pr-16"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                  <span className="text-gray-500">ETH</span>
+                  <span className="text-gray-500">{selectedToken}</span>
                 </div>
               </div>
             </div>
@@ -85,12 +100,24 @@ export const Donate = () => {
             </div>
 
             {/* 捐贈按鈕 */}
-            <button className="btn btn-primary w-full text-lg py-4">
+            <button 
+              onClick={handleDonateClick}
+              className="btn btn-primary w-full text-lg py-4"
+            >
               確認贊助
             </button>
           </div>
         </div>
       </motion.div>
+
+      {/* Swap Modal */}
+      <SwapModal
+        isOpen={isSwapModalOpen}
+        onClose={() => setIsSwapModalOpen(false)}
+        onConfirm={handleSwapConfirm}
+        sourceAmount={amount}
+        sourceToken={selectedToken}
+      />
     </div>
   );
 }; 

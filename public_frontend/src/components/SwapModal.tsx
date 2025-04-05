@@ -59,12 +59,22 @@ const mockTokens = {
   },
 };
 
-export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToken }: SwapModalProps) => {
-  const [swapStatus, setSwapStatus] = useState<'initial' | 'quoting' | 'ready' | 'swapping' | 'error'>('initial');
-  const [exchangeRate, setExchangeRate] = useState('0');
-  const [estimatedGas, setEstimatedGas] = useState('0');
-  const [estimatedOutput, setEstimatedOutput] = useState('0');
-  const [estimatedTime, setEstimatedTime] = useState('');
+interface SwapModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  sourceAmount: string;
+  sourceToken: Token;
+  creatorAddress?: string;
+}
+
+export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToken, creatorAddress }: SwapModalProps) => {
+  const [swapStatus, setSwapStatus] = useState<'quoting' | 'ready' | 'processing'>('quoting');
+  const [exchangeRate, setExchangeRate] = useState<string>('0');
+  const [estimatedGas, setEstimatedGas] = useState<string>('0');
+  const [estimatedOutput, setEstimatedOutput] = useState<string>('0');
+  const [estimatedTime, setEstimatedTime] = useState<string>('30-60 秒');
+  const [error, setError] = useState<string | null>(null);
 
   // 獲取代幣價格和 Gas 預估
   useEffect(() => {
@@ -127,12 +137,20 @@ export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToke
   }, [sourceToken, sourceAmount]);
 
   const handleSwap = () => {
-    setSwapStatus('swapping');
-    // 模擬交換過程
+    setSwapStatus('processing');
+    
+    // 模擬交易處理
     setTimeout(() => {
+      console.log('交易處理中', { 
+        amount: sourceAmount, 
+        token: sourceToken, 
+        creatorAddress: creatorAddress || '未指定創作者'
+      });
+      
+      // 這裡將來會處理實際的交易邏輯
+      // 如果有創作者地址，則將資金轉給創作者
+      
       onConfirm();
-      setSwapStatus('initial');
-      onClose();
     }, 2000);
   };
 
@@ -143,125 +161,84 @@ export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToke
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={onClose}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 max-w-md w-full"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6"
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold">確認贊助</h3>
+              <h2 className="text-2xl font-bold">確認贊助</h2>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <FaTimes className="w-5 h-5" />
+                <FaTimes />
               </button>
             </div>
 
-            {/* 代幣轉換預覽 */}
-            <div className="space-y-4">
-              <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={sourceToken.logoURI}
-                      alt={sourceToken.symbol}
-                      className="w-8 h-8 rounded-full"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://via.placeholder.com/32?text=' + sourceToken.symbol.substring(0, 2);
-                      }}
-                    />
-                    <div>
-                      <p className="font-medium">{sourceAmount} {sourceToken.symbol}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        您支付
-                      </p>
+            {swapStatus === 'quoting' ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
+                <p className="text-gray-600 dark:text-gray-400">正在獲取最佳匯率...</p>
+              </div>
+            ) : swapStatus === 'processing' ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
+                <p className="text-gray-600 dark:text-gray-400">交易處理中...</p>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4 mb-6">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <span className="text-gray-600 dark:text-gray-400">贊助金額</span>
+                    <span className="font-medium">{sourceAmount} {sourceToken.symbol}</span>
+                  </div>
+                  
+                  {creatorAddress && (
+                    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <span className="text-gray-600 dark:text-gray-400">創作者地址</span>
+                      <span className="font-medium text-sm">{creatorAddress.slice(0, 6)}...{creatorAddress.slice(-4)}</span>
                     </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <span className="text-gray-600 dark:text-gray-400">預計 USD 價值</span>
+                    <span className="font-medium">${(parseFloat(sourceAmount) * parseFloat(exchangeRate)).toFixed(2)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <span className="text-gray-600 dark:text-gray-400">預計 Gas 費用</span>
+                    <span className="font-medium">{estimatedGas} {sourceToken.symbol}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <span className="text-gray-600 dark:text-gray-400">預計交易時間</span>
+                    <span className="font-medium flex items-center">
+                      <BsClock className="mr-1" /> {estimatedTime}
+                    </span>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex justify-center">
-                <div className="bg-primary-100 dark:bg-primary-900/20 p-2 rounded-full">
-                  <HiArrowDown className="w-6 h-6 text-primary-600" />
-                </div>
-              </div>
-
-              <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <FaEthereum className="w-8 h-8 text-primary-600" />
-                    <div>
-                      <p className="font-medium">${estimatedOutput} USD</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        創作者收到
-                      </p>
-                    </div>
+                {error && (
+                  <div className="mb-4 p-3 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-lg">
+                    {error}
                   </div>
-                </div>
-              </div>
+                )}
 
-              {/* 轉換詳情 */}
-              <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">兌換率</span>
-                  <span>1 {sourceToken.symbol} ≈ ${exchangeRate} USD</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">預估 Gas</span>
-                  <span>{estimatedGas} ETH</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 dark:text-gray-400">預估時間</span>
-                  <span className="flex items-center">
-                    <BsClock className="w-4 h-4 mr-1" />
-                    {estimatedTime}
-                  </span>
-                </div>
-              </div>
-
-              {/* 路徑提供者 */}
-              <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-                <span>最佳路徑由</span>
-                <div className="flex items-center space-x-1">
-                  <Web3Icon symbol="1INCH" className="w-4 h-4" />
-                  <span className="font-medium">1inch</span>
-                </div>
-                <span>提供</span>
-              </div>
-            </div>
-
-            {/* 狀態和按鈕 */}
-            <div className="mt-6">
-              {swapStatus === 'quoting' && (
-                <div className="text-center text-gray-600 dark:text-gray-400 mb-4">
-                  <div className="animate-spin inline-block w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full mb-2"></div>
-                  <p>正在獲取最佳兌換路徑...</p>
-                </div>
-              )}
-
-              {swapStatus === 'error' && (
-                <div className="text-center text-red-600 dark:text-red-400 mb-4">
-                  <p>獲取價格資訊失敗，請稍後再試</p>
-                </div>
-              )}
-
-              <button
-                onClick={handleSwap}
-                disabled={swapStatus !== 'ready'}
-                className={`w-full py-3 px-4 rounded-lg font-medium text-white 
-                  ${swapStatus === 'ready'
-                    ? 'bg-primary-600 hover:bg-primary-700'
-                    : 'bg-gray-400 cursor-not-allowed'
-                  } transition-colors`}
-              >
-                {swapStatus === 'ready' ? '確認贊助' : '準備中...'}
-              </button>
-            </div>
+                <button
+                  onClick={handleSwap}
+                  disabled={!!error}
+                  className="w-full py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  確認贊助
+                </button>
+              </>
+            )}
           </motion.div>
         </motion.div>
       )}

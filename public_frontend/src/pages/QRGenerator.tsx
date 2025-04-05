@@ -7,6 +7,8 @@ import { HiDownload } from 'react-icons/hi';
 import { BiReset } from 'react-icons/bi';
 import { FaEthereum } from 'react-icons/fa';
 import { SiKofi, SiBuymeacoffee, SiPatreon } from 'react-icons/si';
+import { useAccount } from 'wagmi';
+import { HiLink } from 'react-icons/hi';
 
 interface Template {
   id: string;
@@ -103,6 +105,7 @@ const templates: Template[] = [
 ];
 
 export const QRGenerator = () => {
+  const { address } = useAccount();
   const [qrStyle, setQrStyle] = useState<QRCodeStyle>({
     value: 'https://example.com',
     size: 256,
@@ -199,6 +202,17 @@ export const QRGenerator = () => {
     setLogoFile(null);
     setCustomText('支持我的創作');
     setCustomSubtext('掃描 QR 碼進行贊助');
+  };
+
+  // 生成 CreatorsHub 個人頁面連結
+  const creatorProfileUrl = address 
+    ? `https://creatorshub.com/s/${address}` 
+    : 'https://creatorshub.com/s/connect-wallet';
+
+  // 複製連結到剪貼板
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(creatorProfileUrl);
+    alert('連結已複製到剪貼板');
   };
 
   return (
@@ -350,6 +364,26 @@ export const QRGenerator = () => {
               <div className={`mt-4 text-center ${selectedTemplate.style.textClass} text-sm opacity-60`}>
                 由 CreatorsHub 提供支持
               </div>
+            </div>
+
+            {/* CreatorsHub 個人頁面連結 */}
+            <div className="w-full p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <h3 className="text-lg font-medium mb-2">您的 CreatorsHub 個人頁面</h3>
+              <div className="flex items-center">
+                <div className="flex-grow p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 truncate">
+                  {creatorProfileUrl}
+                </div>
+                <button
+                  onClick={copyToClipboard}
+                  className="ml-2 p-2 bg-primary-500 text-white rounded hover:bg-primary-600"
+                  title="複製連結"
+                >
+                  <HiLink className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                分享此連結，讓支持者可以直接訪問您的 CreatorsHub 頁面
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-4">

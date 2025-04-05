@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@1inch/fusion-sdk": "^2.2.3",
     "@headlessui/react": "^2.2.1",
     "@heroicons/react": "^2.2.0",
     "@rainbow-me/rainbowkit": "^2.0.0",

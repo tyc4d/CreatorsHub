@@ -22,6 +22,9 @@ export const Layout = ({ children }: LayoutProps) => {
                 <a href="/history" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                   交易歷史
                 </a>
+                <a href="/gallery" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                  創作者畫廊
+                </a>
                 {/* 未來可以在這裡添加更多導航連結 */}
               </div>
             </div>
@@ -36,6 +39,9 @@ export const Layout = ({ children }: LayoutProps) => {
             </a>
             <a href="/history" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               交易歷史
+            </a>
+            <a href="/gallery" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              創作者畫廊
             </a>
             {/* 未來可以在這裡添加更多導航連結 */}
           </div>

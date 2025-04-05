@@ -1,0 +1,3 @@
+[submodule "1inch-vercel-proxy"]
+	path = 1inch-vercel-proxy
+	url = https://github.com/tyc4d/1inch-vercel-proxy

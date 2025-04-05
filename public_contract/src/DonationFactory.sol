@@ -6,6 +6,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./interfaces/IDonationContract.sol";
+import "./DonationContract.sol";
+import "./CreatorNFT.sol";
+import "./SupporterNFT.sol";
 
 /**
  * @title DonationFactory
@@ -15,15 +18,33 @@ contract DonationFactory is Ownable {
     using Counters for Counters.Counter;
 
     // 事件定義
-    event DonationContractCreated(address indexed creator, address contractAddress);
-    event CreatorNFTMinted(address indexed creator, uint256 tokenId);
-    event CreatorRegistered(address indexed creator, string channelImage);
+    event DonationContractCreated(
+        address indexed creator,
+        address contractAddress,
+        string name,
+        string description
+    );
+    event CreatorNFTMinted(
+        address indexed creator,
+        uint256 tokenId,
+        string name,
+        string description
+    );
+    event SupporterNFTMinted(
+        address indexed supporter,
+        address indexed creator,
+        uint256 tokenId,
+        uint256 amount
+    );
 
     // 狀態變量
     Counters.Counter private _tokenIds;
     mapping(address => bool) public isCreator;
-    mapping(address => address) public creatorToDonationContract;
+    mapping(address => address) public creatorToContract;
     mapping(address => uint256) public creatorToNFTId;
+    CreatorNFT public creatorNFT;
+    SupporterNFT public supporterNFT;
+    DonationContract public donationContractTemplate;
 
     // 創作者資訊結構
     struct CreatorInfo {
@@ -35,17 +56,18 @@ contract DonationFactory is Ownable {
     // 創作者資訊映射
     mapping(address => CreatorInfo) public creatorInfo;
 
-    // 捐贈合約位元組碼
-    bytes public donationContractBytecode;
-
-    constructor() Ownable(msg.sender) {}
-
-    /**
-     * @dev 設置捐贈合約位元組碼
-     * @param _bytecode 捐贈合約的位元組碼
-     */
-    function setDonationContractBytecode(bytes memory _bytecode) external onlyOwner {
-        donationContractBytecode = _bytecode;
+    constructor(
+        address _creatorNFT,
+        address _supporterNFT,
+        address _donationContractTemplate
+    ) Ownable(msg.sender) {
+        require(_creatorNFT != address(0), "Invalid CreatorNFT address");
+        require(_supporterNFT != address(0), "Invalid SupporterNFT address");
+        require(_donationContractTemplate != address(0), "Invalid DonationContract template address");
+        
+        creatorNFT = CreatorNFT(_creatorNFT);
+        supporterNFT = SupporterNFT(_supporterNFT);
+        donationContractTemplate = DonationContract(_donationContractTemplate);
     }
 
     /**
@@ -55,14 +77,15 @@ contract DonationFactory is Ownable {
      */
     function registerCreator(string memory _channelImage) external returns (address) {
         require(!isCreator[msg.sender], "Creator already registered");
-        require(donationContractBytecode.length > 0, "Donation contract bytecode not set");
+        require(bytes(_channelImage).length > 0, "Channel image cannot be empty");
 
         // 部署新的捐贈合約
-        address newContract = deployDonationContract(msg.sender);
+        DonationContract newContract = new DonationContract();
+        newContract.initialize(msg.sender);
         
         // 更新創作者狀態
         isCreator[msg.sender] = true;
-        creatorToDonationContract[msg.sender] = newContract;
+        creatorToContract[msg.sender] = address(newContract);
         
         // 儲存創作者資訊
         creatorInfo[msg.sender] = CreatorInfo({
@@ -71,50 +94,103 @@ contract DonationFactory is Ownable {
             isActive: true
         });
 
-        emit CreatorRegistered(msg.sender, _channelImage);
-        emit DonationContractCreated(msg.sender, newContract);
+        // 鑄造創作者 NFT
+        uint256 tokenId = creatorNFT.mintCreatorNFT(
+            msg.sender,
+            "",
+            ""
+        );
+        
+        emit DonationContractCreated(
+            msg.sender,
+            address(newContract),
+            "",
+            ""
+        );
+        
+        emit CreatorNFTMinted(
+            msg.sender,
+            tokenId,
+            "",
+            ""
+        );
 
-        return newContract;
+        return address(newContract);
     }
 
     /**
-     * @dev 部署新的捐贈合約
-     * @param _creator 創作者地址
-     * @return 新部署的合約地址
+     * @dev 創建新的捐贈合約
+     * @param _name 創作者名稱
+     * @param _description 創作者描述
+     * @return 新創建的捐贈合約地址
      */
-    function deployDonationContract(address _creator) internal returns (address) {
-        bytes memory bytecode = donationContractBytecode;
-        address newContract;
+    function createDonationContract(
+        string memory _name,
+        string memory _description
+    ) external returns (address) {
+        require(!isCreator[msg.sender], "Creator already exists");
+        require(bytes(_name).length > 0, "Name cannot be empty");
         
-        assembly {
-            newContract := create(0, add(bytecode, 0x20), mload(bytecode))
-        }
+        // 部署新的捐贈合約
+        DonationContract newContract = new DonationContract();
+        newContract.initialize(msg.sender);
         
-        require(newContract != address(0), "Contract deployment failed");
+        // 更新狀態
+        creatorToContract[msg.sender] = address(newContract);
+        isCreator[msg.sender] = true;
         
-        // 初始化新合約
-        IDonationContract(newContract).initialize(_creator);
+        // 鑄造創作者 NFT
+        uint256 tokenId = creatorNFT.mintCreatorNFT(
+            msg.sender,
+            _name,
+            _description
+        );
         
-        return newContract;
+        emit DonationContractCreated(
+            msg.sender,
+            address(newContract),
+            _name,
+            _description
+        );
+        
+        emit CreatorNFTMinted(
+            msg.sender,
+            tokenId,
+            _name,
+            _description
+        );
+        
+        return address(newContract);
     }
 
     /**
-     * @dev 鑄造創作者 NFT
+     * @dev 鑄造支持者 NFT
+     * @param _supporter 支持者地址
      * @param _creator 創作者地址
-     * @return tokenId 鑄造的 NFT ID
+     * @param _amount 捐贈金額
      */
-    function mintCreatorNFT(address _creator) external onlyOwner returns (uint256) {
-        require(isCreator[_creator], "Creator not registered");
-        require(creatorToNFTId[_creator] == 0, "NFT already minted");
-
-        _tokenIds.increment();
-        uint256 newTokenId = _tokenIds.current();
+    function mintSupporterNFT(
+        address _supporter,
+        address _creator,
+        uint256 _amount
+    ) external {
+        require(isCreator[_creator], "Creator does not exist");
+        require(_amount > 0, "Amount must be greater than 0");
         
-        creatorToNFTId[_creator] = newTokenId;
+        uint256 tokenId = supporterNFT.mintSupporterNFT(
+            _supporter,
+            _creator,
+            _amount,
+            "ETH",
+            block.timestamp
+        );
         
-        emit CreatorNFTMinted(_creator, newTokenId);
-        
-        return newTokenId;
+        emit SupporterNFTMinted(
+            _supporter,
+            _creator,
+            tokenId,
+            _amount
+        );
     }
 
     /**
@@ -122,16 +198,16 @@ contract DonationFactory is Ownable {
      * @param _creator 創作者地址
      * @return 捐贈合約地址
      */
-    function getCreatorDonationContract(address _creator) external view returns (address) {
-        return creatorToDonationContract[_creator];
+    function getCreatorContract(address _creator) external view returns (address) {
+        return creatorToContract[_creator];
     }
 
     /**
-     * @dev 檢查地址是否為已註冊創作者
+     * @dev 檢查地址是否為創作者
      * @param _address 要檢查的地址
      * @return 是否為創作者
      */
-    function isRegisteredCreator(address _address) external view returns (bool) {
+    function checkIsCreator(address _address) external view returns (bool) {
         return isCreator[_address];
     }
 

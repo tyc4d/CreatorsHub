@@ -5,13 +5,36 @@ import { BiTransfer } from 'react-icons/bi';
 import { HiArrowDown } from 'react-icons/hi';
 import { BsClock } from 'react-icons/bs';
 import { Web3Icon } from '@bgd-labs/react-web3-icons';
+import { formatUnits, parseUnits } from 'viem';
 
-interface SwapModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  sourceAmount: string;
-  sourceToken: string;
+interface Token {
+  chainId: number;
+  address: string;
+  name: string;
+  decimals: number;
+  symbol: string;
+  logoURI: string;
+  tags: string[];
+}
+
+interface GasPrice {
+  baseFee: string;
+  low: {
+    maxPriorityFeePerGas: string;
+    maxFeePerGas: string;
+  };
+  medium: {
+    maxPriorityFeePerGas: string;
+    maxFeePerGas: string;
+  };
+  high: {
+    maxPriorityFeePerGas: string;
+    maxFeePerGas: string;
+  };
+  instant: {
+    maxPriorityFeePerGas: string;
+    maxFeePerGas: string;
+  };
 }
 
 // 模擬數據
@@ -38,23 +61,70 @@ const mockTokens = {
 
 export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToken }: SwapModalProps) => {
   const [swapStatus, setSwapStatus] = useState<'initial' | 'quoting' | 'ready' | 'swapping' | 'error'>('initial');
-  const [estimatedGas, setEstimatedGas] = useState('0.005');
-  const [exchangeRate, setExchangeRate] = useState('1850.75');
+  const [exchangeRate, setExchangeRate] = useState('0');
+  const [estimatedGas, setEstimatedGas] = useState('0');
   const [estimatedOutput, setEstimatedOutput] = useState('0');
-  const [estimatedTime, setEstimatedTime] = useState('15-30 秒');
+  const [estimatedTime, setEstimatedTime] = useState('');
 
-  // 模擬獲取報價
+  // 獲取代幣價格和 Gas 預估
   useEffect(() => {
-    if (isOpen && sourceAmount && sourceToken) {
+    const fetchPriceAndGas = async () => {
+      if (!sourceToken?.chainId || !sourceAmount) return;
       setSwapStatus('quoting');
-      // 模擬 API 調用延遲
-      setTimeout(() => {
-        const mockOutput = Number(sourceAmount) * Number(exchangeRate);
-        setEstimatedOutput(mockOutput.toFixed(4));
+
+      try {
+        // 獲取代幣價格
+        const priceResponse = await fetch('https://1inch-vercel-proxy-pi.vercel.app/price/v1.1/' + sourceToken.chainId, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer 0ysuEh7F0SLkDFqQ2M5B9ItYTgWUvUO1',
+            'accept': 'application/json',
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            tokens: [sourceToken.address],
+            currency: 'USD'
+          })
+        });
+        const priceData = await priceResponse.json();
+        const tokenPrice = priceData[sourceToken.address] || '0';
+        setExchangeRate(tokenPrice);
+
+        // 獲取 Gas 價格
+        const gasResponse = await fetch(`https://1inch-vercel-proxy-pi.vercel.app/gas-price/v1.5/${sourceToken.chainId}`);
+        const gasData: GasPrice = await gasResponse.json();
+        
+        // 計算預估 Gas（使用 medium 設置）
+        const gasLimit = '200000'; // 預設 gas limit
+        const gasPriceInEth = formatUnits(BigInt(gasData.medium.maxFeePerGas), 9); // 轉換為 Gwei
+        const estimatedGasInEth = (Number(gasPriceInEth) * Number(gasLimit) / 1e9).toFixed(6);
+        setEstimatedGas(estimatedGasInEth);
+
+        // 預估交易時間
+        const baseFeeGwei = Number(formatUnits(BigInt(gasData.baseFee), 9));
+        const medianPriorityFeeGwei = Number(formatUnits(BigInt(gasData.medium.maxPriorityFeePerGas), 9));
+        
+        if (medianPriorityFeeGwei <= baseFeeGwei * 0.1) {
+          setEstimatedTime('30-60 秒');
+        } else if (medianPriorityFeeGwei <= baseFeeGwei * 0.2) {
+          setEstimatedTime('15-30 秒');
+        } else {
+          setEstimatedTime('5-15 秒');
+        }
+
+        // 計算預估輸出
+        const outputAmount = Number(sourceAmount) * Number(tokenPrice);
+        setEstimatedOutput(outputAmount.toFixed(6));
+
         setSwapStatus('ready');
-      }, 1500);
-    }
-  }, [isOpen, sourceAmount, sourceToken]);
+      } catch (error) {
+        console.error('Error fetching price and gas:', error);
+        setSwapStatus('error');
+      }
+    };
+
+    fetchPriceAndGas();
+  }, [sourceToken, sourceAmount]);
 
   const handleSwap = () => {
     setSwapStatus('swapping');
@@ -97,12 +167,16 @@ export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToke
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <img
-                      src={mockTokens[sourceToken as keyof typeof mockTokens]?.logo}
-                      alt={sourceToken}
-                      className="w-8 h-8"
+                      src={sourceToken.logoURI}
+                      alt={sourceToken.symbol}
+                      className="w-8 h-8 rounded-full"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/32?text=' + sourceToken.symbol.substring(0, 2);
+                      }}
                     />
                     <div>
-                      <p className="font-medium">{sourceAmount} {sourceToken}</p>
+                      <p className="font-medium">{sourceAmount} {sourceToken.symbol}</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         您支付
                       </p>
@@ -122,7 +196,7 @@ export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToke
                   <div className="flex items-center space-x-3">
                     <FaEthereum className="w-8 h-8 text-primary-600" />
                     <div>
-                      <p className="font-medium">{estimatedOutput} ETH</p>
+                      <p className="font-medium">${estimatedOutput} USD</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         創作者收到
                       </p>
@@ -135,7 +209,7 @@ export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToke
               <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500 dark:text-gray-400">兌換率</span>
-                  <span>1 {sourceToken} ≈ {exchangeRate} ETH</span>
+                  <span>1 {sourceToken.symbol} ≈ ${exchangeRate} USD</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500 dark:text-gray-400">預估 Gas</span>
@@ -170,10 +244,9 @@ export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToke
                 </div>
               )}
 
-              {swapStatus === 'swapping' && (
-                <div className="text-center text-gray-600 dark:text-gray-400 mb-4">
-                  <div className="animate-spin inline-block w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full mb-2"></div>
-                  <p>正在處理交易...</p>
+              {swapStatus === 'error' && (
+                <div className="text-center text-red-600 dark:text-red-400 mb-4">
+                  <p>獲取價格資訊失敗，請稍後再試</p>
                 </div>
               )}
 

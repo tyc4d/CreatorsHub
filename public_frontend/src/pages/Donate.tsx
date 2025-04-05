@@ -266,7 +266,7 @@ export const Donate = () => {
         onClose={() => setIsSwapModalOpen(false)}
         onConfirm={handleSwapConfirm}
         sourceAmount={amount}
-        sourceToken={selectedToken?.symbol || 'ETH'}
+        sourceToken={selectedToken!}
       />
 
       {/* Token Selector */}
@@ -274,6 +274,7 @@ export const Donate = () => {
         isOpen={isTokenSelectorOpen}
         onClose={() => setIsTokenSelectorOpen(false)}
         onSelect={setSelectedToken}
+        selectedToken={selectedToken}
       />
     </div>
   );

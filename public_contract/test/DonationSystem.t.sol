@@ -59,7 +59,8 @@ contract DonationSystemTest is Test {
         factory = new DonationFactory(
             address(creatorNFT),
             address(supporterNFT),
-            address(donationContractTemplate)
+            payable(address(donationContractTemplate)),
+            address(mockPriceOracle)
         );
         
         // 初始化合約模板
@@ -99,7 +100,7 @@ contract DonationSystemTest is Test {
         vm.stopPrank();
         
         // 獲取捐贈合約
-        DonationContract donationContract = DonationContract(contractAddress);
+        DonationContract donationContract = DonationContract(payable(contractAddress));
         
         // 模擬捐贈
         vm.deal(supporter, 1 ether);
@@ -124,7 +125,7 @@ contract DonationSystemTest is Test {
         vm.stopPrank();
         
         // 獲取捐贈合約
-        DonationContract donationContract = DonationContract(contractAddress);
+        DonationContract donationContract = DonationContract(payable(contractAddress));
         
         // 模擬捐贈
         vm.deal(supporter, 1 ether);
@@ -153,7 +154,7 @@ contract DonationSystemTest is Test {
         vm.stopPrank();
         
         // 獲取捐贈合約
-        DonationContract donationContract = DonationContract(contractAddress);
+        DonationContract donationContract = DonationContract(payable(contractAddress));
         
         // 模擬捐贈
         vm.deal(supporter, 1 ether);
@@ -262,7 +263,7 @@ contract DonationSystemTest is Test {
         vm.stopPrank();
         
         // 獲取捐贈合約
-        DonationContract donationContract = DonationContract(contractAddress);
+        DonationContract donationContract = DonationContract(payable(contractAddress));
         
         // 模擬捐贈
         vm.deal(supporter, 1 ether);

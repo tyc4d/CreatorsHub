@@ -19,7 +19,7 @@ contract DeployPriceOracle is Script {
         
         initialOracles[0] = 0x1234567890123456789012345678901234567890; // 1inch 預言機
         initialOracles[1] = 0x5678901234567890123456789012345678901234; // Chainlink 預言機
-        initialOracles[2] = 0x9abcdef0123456789012345678901234567890ab; // 自定義預言機
+        initialOracles[2] = 0x9AbCdEf0123456789012345678901234567890ab; // 自定義預言機
         
         oracleNames[0] = "1inch Oracle";
         oracleNames[1] = "Chainlink Oracle";

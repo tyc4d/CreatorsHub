@@ -41,6 +41,7 @@ contract DonationFactory is Ownable {
     CreatorNFT public creatorNFT;
     SupporterNFT public supporterNFT;
     DonationContract public donationContractTemplate;
+    address public priceOracle;
 
     // 創作者資訊結構
     struct CreatorInfo {
@@ -55,15 +56,18 @@ contract DonationFactory is Ownable {
     constructor(
         address _creatorNFT,
         address _supporterNFT,
-        address _donationContractTemplate
+        address payable _donationContractTemplate,
+        address _priceOracle
     ) Ownable(msg.sender) {
         require(_creatorNFT != address(0), "Invalid CreatorNFT address");
         require(_supporterNFT != address(0), "Invalid SupporterNFT address");
         require(_donationContractTemplate != address(0), "Invalid DonationContract template address");
+        require(_priceOracle != address(0), "Invalid PriceOracle address");
         
         creatorNFT = CreatorNFT(_creatorNFT);
         supporterNFT = SupporterNFT(_supporterNFT);
-        donationContractTemplate = DonationContract(_donationContractTemplate);
+        donationContractTemplate = DonationContract(payable(_donationContractTemplate));
+        priceOracle = _priceOracle;
     }
 
     /**
@@ -77,7 +81,7 @@ contract DonationFactory is Ownable {
 
         // 部署新的捐贈合約
         DonationContract newContract = new DonationContract();
-        newContract.initialize(msg.sender);
+        newContract.initialize(msg.sender, address(priceOracle));
         
         // 更新創作者狀態
         isCreator[msg.sender] = true;
@@ -104,13 +108,6 @@ contract DonationFactory is Ownable {
             ""
         );
         
-        emit CreatorNFTMinted(
-            msg.sender,
-            tokenId,
-            "",
-            ""
-        );
-
         return address(newContract);
     }
 
@@ -165,14 +162,10 @@ contract DonationFactory is Ownable {
      * @param _creator 創作者地址
      * @param _amount 捐贈金額
      */
-    function mintSupporterNFT(
-        address _supporter,
-        address _creator,
-        uint256 _amount
-    ) external {
-        require(isCreator[_creator], "Creator does not exist");
-        require(_amount > 0, "Amount must be greater than 0");
+    function mintSupporterNFT(address _supporter, address _creator, uint256 _amount) external {
+        require(msg.sender == creatorToContract[_creator], "Only donation contract can mint");
         
+        // 鑄造支持者 NFT
         uint256 tokenId = supporterNFT.mintSupporterNFT(
             _supporter,
             _creator,

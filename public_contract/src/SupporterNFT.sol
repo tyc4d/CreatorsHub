@@ -2,14 +2,14 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title SupporterNFT
  * @dev 實現支持者 NFT，用於記錄支持者的捐贈歷史
  */
-contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
+contract SupporterNFT is ERC721, ERC721Enumerable, Ownable {
     // 狀態變量
     uint256 private _nextTokenId;
     mapping(uint256 => SupporterMetadata) private _supporterMetadata;
@@ -40,7 +40,7 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
         uint256 timestamp;    // 捐贈時間
     }
 
-    constructor() ERC721("CreatorsHub Supporter NFT", "CSNFT") Ownable(msg.sender) {}
+    constructor() ERC721("Supporter NFT", "SNFT") Ownable(msg.sender) {}
 
     /**
      * @dev 檢查代幣是否存在
@@ -143,7 +143,8 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
     // 重寫必要的函數
     function _update(address to, uint256 tokenId, address auth)
         internal
-        override(ERC721)
+        virtual
+        override(ERC721, ERC721Enumerable)
         returns (address)
     {
         return super._update(to, tokenId, auth);
@@ -151,7 +152,8 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
 
     function _increaseBalance(address account, uint128 value)
         internal
-        override(ERC721)
+        virtual
+        override(ERC721, ERC721Enumerable)
     {
         super._increaseBalance(account, value);
     }
@@ -159,7 +161,7 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
     function tokenURI(uint256 tokenId)
         public
         view
-        override(ERC721, ERC721URIStorage)
+        override(ERC721, ERC721Enumerable)
         returns (string memory)
     {
         return super.tokenURI(tokenId);
@@ -168,7 +170,8 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721URIStorage)
+        virtual
+        override(ERC721, ERC721Enumerable)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

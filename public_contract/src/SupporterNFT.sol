@@ -2,19 +2,19 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title SupporterNFT
  * @dev 實現支持者 NFT，用於記錄支持者的捐贈歷史
  */
-contract SupporterNFT is ERC721, ERC721Enumerable, Ownable {
+contract SupporterNFT is ERC721, Ownable {
     // 狀態變量
     uint256 private _nextTokenId;
     mapping(uint256 => SupporterMetadata) private _supporterMetadata;
     mapping(address => mapping(address => uint256)) public supporterToCreatorTokenId;
     mapping(uint256 => bool) private _tokenExists;
+    mapping(address => uint256[]) private _tokensOfOwner;
 
     // 事件定義
     event SupporterNFTMinted(
@@ -86,6 +86,7 @@ contract SupporterNFT is ERC721, ERC721Enumerable, Ownable {
         _safeMint(_supporter, tokenId);
         supporterToCreatorTokenId[_supporter][_creator] = tokenId;
         _tokenExists[tokenId] = true;
+        _tokensOfOwner[_supporter].push(tokenId);
         
         emit SupporterNFTMinted(
             _supporter,
@@ -140,40 +141,22 @@ contract SupporterNFT is ERC721, ERC721Enumerable, Ownable {
         return supporterToCreatorTokenId[_supporter][_creator];
     }
 
-    // 重寫必要的函數
-    function _update(address to, uint256 tokenId, address auth)
-        internal
-        virtual
-        override(ERC721, ERC721Enumerable)
-        returns (address)
-    {
-        return super._update(to, tokenId, auth);
+    /**
+     * @dev 獲取擁有者的所有代幣 ID
+     * @param owner 擁有者地址
+     * @return 代幣 ID 列表
+     */
+    function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256) {
+        require(index < _tokensOfOwner[owner].length, "Index out of bounds");
+        return _tokensOfOwner[owner][index];
     }
 
-    function _increaseBalance(address account, uint128 value)
-        internal
-        virtual
-        override(ERC721, ERC721Enumerable)
-    {
-        super._increaseBalance(account, value);
-    }
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721Enumerable)
-        returns (string memory)
-    {
-        return super.tokenURI(tokenId);
-    }
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC721, ERC721Enumerable)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
+    /**
+     * @dev 獲取擁有者的代幣數量
+     * @param owner 擁有者地址
+     * @return 代幣數量
+     */
+    function balanceOf(address owner) public view override returns (uint256) {
+        return _tokensOfOwner[owner].length;
     }
 } 

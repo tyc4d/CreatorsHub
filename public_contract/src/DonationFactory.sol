@@ -97,15 +97,16 @@ contract DonationFactory is Ownable {
         // 鑄造創作者 NFT
         uint256 tokenId = creatorNFT.mintCreatorNFT(
             msg.sender,
-            "",
-            ""
+            "Creator",
+            "A content creator on our platform"
         );
+        creatorToNFTId[msg.sender] = tokenId;
         
         emit DonationContractCreated(
             msg.sender,
             address(newContract),
-            "",
-            ""
+            "Creator",
+            "A content creator on our platform"
         );
         
         return address(newContract);
@@ -126,7 +127,7 @@ contract DonationFactory is Ownable {
         
         // 部署新的捐贈合約
         DonationContract newContract = new DonationContract();
-        newContract.initialize(msg.sender);
+        newContract.initialize(msg.sender, address(priceOracle));
         
         // 更新狀態
         creatorToContract[msg.sender] = address(newContract);

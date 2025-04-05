@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaEthereum, FaTimes } from 'react-icons/fa';
 import { BiTransfer } from 'react-icons/bi';
 import { HiArrowDown } from 'react-icons/hi';
-import { 1inch } from '@bgd-labs/react-web3-icons';
 import { BsClock } from 'react-icons/bs';
+import { Web3Icon } from '@bgd-labs/react-web3-icons';
 
 interface SwapModalProps {
   isOpen: boolean;
@@ -154,7 +154,7 @@ export const SwapModal = ({ isOpen, onClose, onConfirm, sourceAmount, sourceToke
               <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                 <span>最佳路徑由</span>
                 <div className="flex items-center space-x-1">
-                  <Si1InchProtocol className="w-4 h-4" />
+                  <Web3Icon symbol="1INCH" className="w-4 h-4" />
                   <span className="font-medium">1inch</span>
                 </div>
                 <span>提供</span>

@@ -8,14 +8,32 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title CreatorNFT
- * @dev 實現創作者身份認證和權益管理
+ * @dev 實現創作者身份驗證和權益管理
  */
 contract CreatorNFT is ERC721, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
 
     // 事件定義
-    event CreatorNFTMinted(address indexed creator, uint256 tokenId, string channelImage);
-    event CreatorMetadataUpdated(uint256 indexed tokenId, uint256 totalDonations, uint256 supporterCount);
+    event CreatorNFTMinted(
+        address indexed creator,
+        uint256 tokenId,
+        string name,
+        string description,
+        uint256 timestamp
+    );
+    event CreatorMetadataUpdated(
+        address indexed creator,
+        uint256 tokenId,
+        string name,
+        string description,
+        uint256 timestamp
+    );
+    event CreatorImageUpdated(
+        address indexed creator,
+        uint256 tokenId,
+        string image,
+        uint256 timestamp
+    );
 
     // 狀態變量
     Counters.Counter private _tokenIds;
@@ -24,14 +42,14 @@ contract CreatorNFT is ERC721, ERC721URIStorage, Ownable {
 
     // 創作者資訊結構
     struct CreatorMetadata {
-        string name;          // "CreatorsHub 創作者 NFT"
+        string name;          // 創作者名稱
         string description;   // 創作者描述
-        string image;         // IPFS 上的創作者頭像
-        string channelImage;  // 創作者頻道圖片
-        uint256 joinDate;     // 加入時間戳
-        uint256 totalDonations; // 總贊助額（以 wei 為單位）
-        uint256 supporterCount; // 支持者總數
-        string tier;          // 創作者等級（銅牌/銀牌/金牌/鑽石）
+        string image;         // 創作者 NFT 圖片
+        string channelImage;  // 頻道封面圖片
+        uint256 joinDate;     // 加入時間
+        uint256 totalDonations; // 總捐贈金額
+        uint256 supporterCount; // 支持者數量
+        string tier;          // 創作者等級
     }
 
     constructor() ERC721("CreatorsHub Creator NFT", "CCNFT") Ownable(msg.sender) {}
@@ -39,32 +57,44 @@ contract CreatorNFT is ERC721, ERC721URIStorage, Ownable {
     /**
      * @dev 鑄造創作者 NFT
      * @param _creator 創作者地址
-     * @param _channelImage 創作者頻道圖片 URL
+     * @param _name 創作者名稱
+     * @param _description 創作者描述
      * @return tokenId 鑄造的 NFT ID
      */
-    function mintCreatorNFT(address _creator, string memory _channelImage) external onlyOwner returns (uint256) {
-        require(creatorToTokenId[_creator] == 0, "Creator already has NFT");
+    function mintCreatorNFT(
+        address _creator,
+        string memory _name,
+        string memory _description
+    ) external onlyOwner returns (uint256) {
+        require(_creator != address(0), "Invalid creator address");
+        require(creatorToTokenId[_creator] == 0, "NFT already minted");
         
         _tokenIds.increment();
         uint256 newTokenId = _tokenIds.current();
         
         // 創建創作者元數據
         _creatorMetadata[newTokenId] = CreatorMetadata({
-            name: "CreatorsHub 創作者 NFT",
-            description: "這是一個代表 CreatorsHub 創作者身份的 NFT",
-            image: "",  // 將由創作者稍後設置
-            channelImage: _channelImage,
+            name: _name,
+            description: _description,
+            image: "",
+            channelImage: "",
             joinDate: block.timestamp,
             totalDonations: 0,
             supporterCount: 0,
-            tier: "銅牌"
+            tier: "Bronze"
         });
         
         // 鑄造 NFT
         _safeMint(_creator, newTokenId);
         creatorToTokenId[_creator] = newTokenId;
         
-        emit CreatorNFTMinted(_creator, newTokenId, _channelImage);
+        emit CreatorNFTMinted(
+            _creator,
+            newTokenId,
+            _name,
+            _description,
+            block.timestamp
+        );
         
         return newTokenId;
     }
@@ -72,48 +102,75 @@ contract CreatorNFT is ERC721, ERC721URIStorage, Ownable {
     /**
      * @dev 更新創作者元數據
      * @param _tokenId NFT ID
-     * @param _totalDonations 總贊助額
-     * @param _supporterCount 支持者數量
+     * @param _name 新名稱
+     * @param _description 新描述
      */
     function updateCreatorMetadata(
         uint256 _tokenId,
-        uint256 _totalDonations,
-        uint256 _supporterCount
-    ) external onlyOwner {
+        string memory _name,
+        string memory _description
+    ) external {
+        require(_exists(_tokenId), "NFT does not exist");
+        require(ownerOf(_tokenId) == msg.sender, "Not token owner");
+        
+        CreatorMetadata storage metadata = _creatorMetadata[_tokenId];
+        metadata.name = _name;
+        metadata.description = _description;
+        
+        emit CreatorMetadataUpdated(
+            msg.sender,
+            _tokenId,
+            _name,
+            _description,
+            block.timestamp
+        );
+    }
+
+    /**
+     * @dev 更新創作者圖片
+     * @param _tokenId NFT ID
+     * @param _image 新圖片 URL
+     */
+    function updateCreatorImage(
+        uint256 _tokenId,
+        string memory _image
+    ) external {
+        require(_exists(_tokenId), "NFT does not exist");
+        require(ownerOf(_tokenId) == msg.sender, "Not token owner");
+        
+        _creatorMetadata[_tokenId].image = _image;
+        
+        emit CreatorImageUpdated(
+            msg.sender,
+            _tokenId,
+            _image,
+            block.timestamp
+        );
+    }
+
+    /**
+     * @dev 更新創作者等級
+     * @param _tokenId NFT ID
+     * @param _totalDonations 總捐贈金額
+     */
+    function updateCreatorTier(uint256 _tokenId, uint256 _totalDonations) external onlyOwner {
         require(_exists(_tokenId), "NFT does not exist");
         
         CreatorMetadata storage metadata = _creatorMetadata[_tokenId];
         metadata.totalDonations = _totalDonations;
-        metadata.supporterCount = _supporterCount;
-        
-        // 更新創作者等級
         metadata.tier = calculateTier(_totalDonations);
-        
-        emit CreatorMetadataUpdated(_tokenId, _totalDonations, _supporterCount);
-    }
-
-    /**
-     * @dev 更新創作者頭像
-     * @param _tokenId NFT ID
-     * @param _image 新的頭像 URL
-     */
-    function updateCreatorImage(uint256 _tokenId, string memory _image) external {
-        require(_exists(_tokenId), "NFT does not exist");
-        require(ownerOf(_tokenId) == msg.sender, "Not NFT owner");
-        
-        _creatorMetadata[_tokenId].image = _image;
     }
 
     /**
      * @dev 計算創作者等級
-     * @param _totalDonations 總贊助額
+     * @param _totalDonations 總捐贈金額
      * @return 創作者等級
      */
     function calculateTier(uint256 _totalDonations) public pure returns (string memory) {
-        if (_totalDonations >= 100 ether) return "鑽石";
-        if (_totalDonations >= 50 ether) return "金牌";
-        if (_totalDonations >= 10 ether) return "銀牌";
-        return "銅牌";
+        if (_totalDonations >= 100 ether) return "Diamond";
+        if (_totalDonations >= 50 ether) return "Gold";
+        if (_totalDonations >= 10 ether) return "Silver";
+        return "Bronze";
     }
 
     /**

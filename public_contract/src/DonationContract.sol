@@ -10,8 +10,22 @@ import "./interfaces/ITokenPriceOracle.sol";
  */
 contract DonationContract is Ownable {
     // 事件定義
-    event DonationReceived(address indexed donor, uint256 amount, uint256 usdValue);
-    event WithdrawalProcessed(address indexed creator, uint256 amount);
+    event DonationReceived(
+        address indexed donor,
+        uint256 amount,
+        uint256 usdValue,
+        uint256 timestamp
+    );
+    event WithdrawalProcessed(
+        address indexed creator,
+        uint256 amount,
+        uint256 timestamp
+    );
+    event PriceUpdated(
+        address indexed token,
+        uint256 price,
+        uint256 timestamp
+    );
 
     // 狀態變量
     address public creator;
@@ -50,7 +64,12 @@ contract DonationContract is Ownable {
         
         totalDonations += msg.value;
         
-        emit DonationReceived(msg.sender, msg.value, usdValue);
+        emit DonationReceived(
+            msg.sender,
+            msg.value,
+            usdValue,
+            block.timestamp
+        );
     }
 
     /**
@@ -64,7 +83,11 @@ contract DonationContract is Ownable {
         (bool success, ) = creator.call{value: amount}("");
         require(success, "Transfer failed");
         
-        emit WithdrawalProcessed(creator, amount);
+        emit WithdrawalProcessed(
+            creator,
+            amount,
+            block.timestamp
+        );
     }
 
     /**

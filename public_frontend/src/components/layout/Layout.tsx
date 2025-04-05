@@ -25,7 +25,9 @@ export const Layout = ({ children }: LayoutProps) => {
                 <a href="/gallery" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                   創作者畫廊
                 </a>
-                {/* 未來可以在這裡添加更多導航連結 */}
+                <a href="/qr" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                  QR 碼生成器
+                </a>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -43,7 +45,9 @@ export const Layout = ({ children }: LayoutProps) => {
             <a href="/gallery" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               創作者畫廊
             </a>
-            {/* 未來可以在這裡添加更多導航連結 */}
+            <a href="/qr" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              QR 碼生成器
+            </a>
           </div>
         </nav>
       </header>

@@ -37,7 +37,7 @@ contract DonationTest is Test {
 
     function testEthDonation() public {
         vm.startPrank(creator);
-        address donationContractAddr = factory.createDonationContract();
+        address payable donationContractAddr = payable(factory.createDonationContract());
         vm.stopPrank();
 
         CreatorDonation donationContract = CreatorDonation(donationContractAddr);

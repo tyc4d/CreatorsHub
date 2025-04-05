@@ -1,3 +1,6 @@
 [submodule "1inch-vercel-proxy"]
 	path = 1inch-vercel-proxy
 	url = https://github.com/tyc4d/1inch-vercel-proxy
+[submodule "DonationFactory/lib/forge-std"]
+	path = DonationFactory/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std

@@ -19,6 +19,9 @@ export const Layout = ({ children }: LayoutProps) => {
                 <a href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                   首頁
                 </a>
+                <a href="/history" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                  交易歷史
+                </a>
                 {/* 未來可以在這裡添加更多導航連結 */}
               </div>
             </div>
@@ -30,6 +33,9 @@ export const Layout = ({ children }: LayoutProps) => {
           <div className="sm:hidden py-2 -mt-1 flex space-x-6">
             <a href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               首頁
+            </a>
+            <a href="/history" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              交易歷史
             </a>
             {/* 未來可以在這裡添加更多導航連結 */}
           </div>

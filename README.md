@@ -16,7 +16,7 @@ Project management
     - [ ] Browser Plugins
     - [ ] Creator Frontend - Management Platform 
 
-## Hook 發想
+## 發想
 對標產品：https://cryptocloud.plus
 Donate 介面展示：https://demopay.cryptocloud.plus/?currency=USDT&network=TRC20&lang=en&roistat_visit=629537
 

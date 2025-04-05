@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "./interfaces/IDonationContract.sol";
 
 /**
  * @title DonationFactory
@@ -33,11 +34,6 @@ contract DonationFactory is Ownable {
 
     // 創作者資訊映射
     mapping(address => CreatorInfo) public creatorInfo;
-
-    // 捐贈合約介面
-    interface IDonationContract {
-        function initialize(address _creator) external;
-    }
 
     // 捐贈合約位元組碼
     bytes public donationContractBytecode;

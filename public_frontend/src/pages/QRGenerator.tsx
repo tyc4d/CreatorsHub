@@ -5,7 +5,24 @@ import { jsPDF } from 'jspdf';
 import { motion } from 'framer-motion';
 import { HiDownload } from 'react-icons/hi';
 import { BiReset } from 'react-icons/bi';
-import { BsQrCode } from 'react-icons/bs';
+import { FaEthereum } from 'react-icons/fa';
+import { SiKofi, SiBuymeacoffee, SiPatreon } from 'react-icons/si';
+
+interface Template {
+  id: string;
+  name: string;
+  icon: JSX.Element;
+  style: {
+    containerClass: string;
+    qrClass: string;
+    textClass: string;
+  };
+  defaultColors: {
+    primary: string;
+    secondary: string;
+    background: string;
+  };
+}
 
 interface QRCodeStyle {
   value: string;
@@ -22,6 +39,69 @@ interface QRCodeStyle {
   };
 }
 
+const templates: Template[] = [
+  {
+    id: 'eth-dark',
+    name: '以太坊暗色',
+    icon: <FaEthereum className="w-6 h-6" />,
+    style: {
+      containerClass: 'bg-gray-900 p-8 rounded-2xl shadow-xl',
+      qrClass: 'bg-white p-4 rounded-xl',
+      textClass: 'text-white',
+    },
+    defaultColors: {
+      primary: '#1a1a1a',
+      secondary: '#ffffff',
+      background: '#000000',
+    },
+  },
+  {
+    id: 'kofi-style',
+    name: 'Ko-fi 風格',
+    icon: <SiKofi className="w-6 h-6" />,
+    style: {
+      containerClass: 'bg-blue-500 p-8 rounded-2xl shadow-xl',
+      qrClass: 'bg-white p-4 rounded-xl',
+      textClass: 'text-white',
+    },
+    defaultColors: {
+      primary: '#0d6efd',
+      secondary: '#ffffff',
+      background: '#ffffff',
+    },
+  },
+  {
+    id: 'coffee',
+    name: '買杯咖啡',
+    icon: <SiBuymeacoffee className="w-6 h-6" />,
+    style: {
+      containerClass: 'bg-yellow-500 p-8 rounded-2xl shadow-xl',
+      qrClass: 'bg-white p-4 rounded-xl',
+      textClass: 'text-gray-900',
+    },
+    defaultColors: {
+      primary: '#ffdd00',
+      secondary: '#000000',
+      background: '#ffffff',
+    },
+  },
+  {
+    id: 'patreon',
+    name: 'Patreon 風格',
+    icon: <SiPatreon className="w-6 h-6" />,
+    style: {
+      containerClass: 'bg-red-600 p-8 rounded-2xl shadow-xl',
+      qrClass: 'bg-white p-4 rounded-xl',
+      textClass: 'text-white',
+    },
+    defaultColors: {
+      primary: '#ff424d',
+      secondary: '#ffffff',
+      background: '#ffffff',
+    },
+  },
+];
+
 export const QRGenerator = () => {
   const [qrStyle, setQrStyle] = useState<QRCodeStyle>({
     value: 'https://example.com',
@@ -32,8 +112,20 @@ export const QRGenerator = () => {
     includeMargin: true,
   });
 
+  const [selectedTemplate, setSelectedTemplate] = useState<Template>(templates[0]);
+  const [customText, setCustomText] = useState('支持我的創作');
+  const [customSubtext, setCustomSubtext] = useState('掃描 QR 碼進行贊助');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const qrRef = useRef<HTMLDivElement>(null);
+
+  const handleTemplateChange = (template: Template) => {
+    setSelectedTemplate(template);
+    setQrStyle(prev => ({
+      ...prev,
+      fgColor: template.defaultColors.secondary,
+      bgColor: template.defaultColors.background,
+    }));
+  };
 
   const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -63,7 +155,7 @@ export const QRGenerator = () => {
         case 'png':
           const pngData = await toPng(qrRef.current, { quality: 1.0 });
           const pngLink = document.createElement('a');
-          pngLink.download = 'qr-code.png';
+          pngLink.download = 'donation-qr.png';
           pngLink.href = pngData;
           pngLink.click();
           break;
@@ -71,7 +163,7 @@ export const QRGenerator = () => {
         case 'svg':
           const svgData = await toSvg(qrRef.current);
           const svgLink = document.createElement('a');
-          svgLink.download = 'qr-code.svg';
+          svgLink.download = 'donation-qr.svg';
           svgLink.href = svgData;
           svgLink.click();
           break;
@@ -87,7 +179,7 @@ export const QRGenerator = () => {
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
           pdf.addImage(pdfData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          pdf.save('qr-code.pdf');
+          pdf.save('donation-qr.pdf');
           break;
       }
     } catch (error) {
@@ -105,16 +197,18 @@ export const QRGenerator = () => {
       includeMargin: true,
     });
     setLogoFile(null);
+    setCustomText('支持我的創作');
+    setCustomSubtext('掃描 QR 碼進行贊助');
   };
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold gradient-text mb-4">
-          QR 碼生成器
+          贊助 QR 碼生成器
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          創建獨特的 QR 碼，展現您的個人品牌風格
+          創建專業的贊助 QR 碼，讓支持者更容易找到您
         </p>
       </div>
 
@@ -127,22 +221,72 @@ export const QRGenerator = () => {
         >
           <h2 className="text-2xl font-semibold mb-6">自定義設置</h2>
           
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* 模板選擇 */}
+            <div>
+              <label className="block text-sm font-medium mb-4">
+                選擇模板
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                {templates.map((template) => (
+                  <button
+                    key={template.id}
+                    onClick={() => handleTemplateChange(template)}
+                    className={`p-4 rounded-lg border-2 flex items-center space-x-3 transition-all ${
+                      selectedTemplate.id === template.id
+                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                        : 'border-gray-200 hover:border-primary-200 dark:border-gray-700'
+                    }`}
+                  >
+                    {template.icon}
+                    <span className="font-medium">{template.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2">
-                網址
+                贊助連結
               </label>
               <input
                 type="text"
                 value={qrStyle.value}
                 onChange={(e) => setQrStyle({ ...qrStyle, value: e.target.value })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+                placeholder="輸入您的贊助連結"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                大小 ({qrStyle.size}x{qrStyle.size})
+                主標題
+              </label>
+              <input
+                type="text"
+                value={customText}
+                onChange={(e) => setCustomText(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+                placeholder="例如：支持我的創作"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                副標題
+              </label>
+              <input
+                type="text"
+                value={customSubtext}
+                onChange={(e) => setCustomSubtext(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+                placeholder="例如：掃描 QR 碼進行贊助"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                QR 碼大小 ({qrStyle.size}x{qrStyle.size})
               </label>
               <input
                 type="range"
@@ -153,46 +297,6 @@ export const QRGenerator = () => {
                 onChange={(e) => setQrStyle({ ...qrStyle, size: Number(e.target.value) })}
                 className="w-full"
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                前景顏色
-              </label>
-              <input
-                type="color"
-                value={qrStyle.fgColor}
-                onChange={(e) => setQrStyle({ ...qrStyle, fgColor: e.target.value })}
-                className="w-full h-10 p-1 rounded-lg"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                背景顏色
-              </label>
-              <input
-                type="color"
-                value={qrStyle.bgColor}
-                onChange={(e) => setQrStyle({ ...qrStyle, bgColor: e.target.value })}
-                className="w-full h-10 p-1 rounded-lg"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                錯誤校正等級
-              </label>
-              <select
-                value={qrStyle.level}
-                onChange={(e) => setQrStyle({ ...qrStyle, level: e.target.value as 'L' | 'M' | 'Q' | 'H' })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
-              >
-                <option value="L">低 (7%)</option>
-                <option value="M">中 (15%)</option>
-                <option value="Q">中高 (25%)</option>
-                <option value="H">高 (30%)</option>
-              </select>
             </div>
 
             <div>
@@ -230,9 +334,22 @@ export const QRGenerator = () => {
           <div className="flex flex-col items-center space-y-6">
             <div
               ref={qrRef}
-              className="p-4 bg-white rounded-lg shadow-inner"
+              className={selectedTemplate.style.containerClass}
             >
-              <QRCodeSVG {...qrStyle} />
+              <div className="text-center mb-4">
+                <h3 className={`text-xl font-bold ${selectedTemplate.style.textClass}`}>
+                  {customText}
+                </h3>
+                <p className={`mt-2 ${selectedTemplate.style.textClass} opacity-80`}>
+                  {customSubtext}
+                </p>
+              </div>
+              <div className={selectedTemplate.style.qrClass}>
+                <QRCodeSVG {...qrStyle} />
+              </div>
+              <div className={`mt-4 text-center ${selectedTemplate.style.textClass} text-sm opacity-60`}>
+                由 CreatorsHub 提供支持
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-4">

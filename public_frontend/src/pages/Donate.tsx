@@ -1,11 +1,24 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { SwapModal } from '../components/SwapModal';
+import { TokenSelector } from '../components/TokenSelector';
+import { FaChevronDown } from 'react-icons/fa';
+
+interface Token {
+  chainId: number;
+  address: string;
+  name: string;
+  decimals: number;
+  symbol: string;
+  logoURI: string;
+  tags: string[];
+}
 
 export const Donate = () => {
   const [amount, setAmount] = useState('');
-  const [selectedToken, setSelectedToken] = useState('ETH');
+  const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+  const [isTokenSelectorOpen, setIsTokenSelectorOpen] = useState(false);
 
   const suggestedAmounts = [
     { value: '0.01', label: '0.01 ETH', tier: '銅牌贊助' },
@@ -18,12 +31,20 @@ export const Donate = () => {
       alert('請輸入贊助金額');
       return;
     }
+    if (!selectedToken) {
+      alert('請選擇代幣');
+      return;
+    }
     setIsSwapModalOpen(true);
   };
 
   const handleSwapConfirm = () => {
     // 這裡將來會處理實際的交易邏輯
     console.log('交易確認', { amount, selectedToken });
+  };
+
+  const handleTokenSelect = (token: Token) => {
+    setSelectedToken(token);
   };
 
   return (
@@ -80,7 +101,7 @@ export const Donate = () => {
                   className="input pr-16"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                  <span className="text-gray-500">{selectedToken}</span>
+                  <span className="text-gray-500">{selectedToken?.symbol || 'ETH'}</span>
                 </div>
               </div>
             </div>
@@ -88,15 +109,52 @@ export const Donate = () => {
             {/* 代幣選擇 */}
             <div className="space-y-4">
               <label className="block text-lg font-medium mb-2">選擇代幣</label>
-              <select
-                value={selectedToken}
-                onChange={(e) => setSelectedToken(e.target.value)}
-                className="select"
+              <button
+                onClick={() => setIsTokenSelectorOpen(true)}
+                className="w-full p-3 flex items-center justify-between border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                <option value="ETH">ETH</option>
-                <option value="USDT">USDT</option>
-                <option value="USDC">USDC</option>
-              </select>
+                <div className="flex items-center">
+                  {selectedToken ? (
+                    <>
+                      <div className="w-8 h-8 mr-3">
+                        {selectedToken.logoURI ? (
+                          <img
+                            src={selectedToken.logoURI}
+                            alt={selectedToken.symbol}
+                            className="w-full h-full rounded-full"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${selectedToken.address}/logo.png`;
+                              target.onerror = () => {
+                                target.src = 'https://via.placeholder.com/32?text=' + selectedToken.symbol.substring(0, 2);
+                              };
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium">
+                            {selectedToken.symbol.substring(0, 2)}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium">{selectedToken.symbol}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{selectedToken.name}</div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 mr-3 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <span className="text-xs font-medium">ETH</span>
+                      </div>
+                      <div>
+                        <div className="font-medium">ETH</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">Ethereum</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <FaChevronDown className="text-gray-400" />
+              </button>
             </div>
 
             {/* 捐贈按鈕 */}
@@ -116,7 +174,15 @@ export const Donate = () => {
         onClose={() => setIsSwapModalOpen(false)}
         onConfirm={handleSwapConfirm}
         sourceAmount={amount}
-        sourceToken={selectedToken}
+        sourceToken={selectedToken?.symbol || 'ETH'}
+      />
+
+      {/* Token Selector */}
+      <TokenSelector
+        isOpen={isTokenSelectorOpen}
+        onClose={() => setIsTokenSelectorOpen(false)}
+        onSelect={handleTokenSelect}
+        selectedToken={selectedToken || undefined}
       />
     </div>
   );

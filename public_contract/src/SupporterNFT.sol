@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title SupporterNFT
- * @dev 實現支持者獎勵和身份認證系統
+ * @dev 實現支持者 NFT，用於記錄支持者的捐贈歷史
  */
 contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
@@ -19,26 +19,27 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
         address indexed creator,
         uint256 tokenId,
         uint256 amount,
-        string tokenSymbol,
-        uint256 tokenPrice
+        uint256 timestamp
+    );
+    event SupporterMetadataUpdated(
+        address indexed supporter,
+        uint256 tokenId,
+        uint256 amount,
+        uint256 timestamp
     );
 
     // 狀態變量
     Counters.Counter private _tokenIds;
     mapping(uint256 => SupporterMetadata) private _supporterMetadata;
-    mapping(address => mapping(address => uint256[])) public supporterToCreatorTokens;
+    mapping(address => mapping(address => uint256)) public supporterToCreatorTokenId;
 
     // 支持者資訊結構
     struct SupporterMetadata {
-        string name;          // "CreatorsHub 支持者 NFT"
-        string description;   // 支持者描述
-        string image;         // 支持者 NFT 圖片（可根據等級變化）
-        address creator;      // 支持的創作者地址
-        uint256 donateDate;   // 捐贈時間戳
-        uint256 amount;       // 捐贈金額（以 wei 為單位）
-        string tokenSymbol;   // 捐贈代幣符號
-        uint256 tokenPrice;   // 捐贈時的代幣價格（以 USD 為單位）
-        string tier;          // 支持者等級
+        address supporter;    // 支持者地址
+        address creator;      // 創作者地址
+        uint256 amount;       // 捐贈金額
+        string token;         // 捐贈代幣
+        uint256 timestamp;    // 捐贈時間
     }
 
     constructor() ERC721("CreatorsHub Supporter NFT", "CSNFT") Ownable(msg.sender) {}
@@ -48,16 +49,16 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
      * @param _supporter 支持者地址
      * @param _creator 創作者地址
      * @param _amount 捐贈金額
-     * @param _tokenSymbol 代幣符號
-     * @param _tokenPrice 代幣價格（USD）
+     * @param _token 捐贈代幣
+     * @param _timestamp 捐贈時間
      * @return tokenId 鑄造的 NFT ID
      */
     function mintSupporterNFT(
         address _supporter,
         address _creator,
         uint256 _amount,
-        string memory _tokenSymbol,
-        uint256 _tokenPrice
+        string memory _token,
+        uint256 _timestamp
     ) external onlyOwner returns (uint256) {
         require(_supporter != address(0), "Invalid supporter address");
         require(_creator != address(0), "Invalid creator address");
@@ -68,38 +69,48 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
         
         // 創建支持者元數據
         _supporterMetadata[newTokenId] = SupporterMetadata({
-            name: "CreatorsHub Supporter NFT",
-            description: "This NFT represents your support for a creator",
-            image: "",  // 將根據等級動態生成
+            supporter: _supporter,
             creator: _creator,
-            donateDate: block.timestamp,
             amount: _amount,
-            tokenSymbol: _tokenSymbol,
-            tokenPrice: _tokenPrice,
-            tier: calculateTier(_amount)
+            token: _token,
+            timestamp: _timestamp
         });
         
         // 鑄造 NFT
         _safeMint(_supporter, newTokenId);
+        supporterToCreatorTokenId[_supporter][_creator] = newTokenId;
         
-        // 記錄支持者與創作者的關係
-        supporterToCreatorTokens[_supporter][_creator].push(newTokenId);
-        
-        emit SupporterNFTMinted(_supporter, _creator, newTokenId, _amount, _tokenSymbol, _tokenPrice);
+        emit SupporterNFTMinted(
+            _supporter,
+            _creator,
+            newTokenId,
+            _amount,
+            _timestamp
+        );
         
         return newTokenId;
     }
 
     /**
-     * @dev 計算支持者等級
-     * @param _amount 捐贈金額（以 wei 為單位）
-     * @return 支持者等級
+     * @dev 更新支持者元數據
+     * @param _tokenId NFT ID
+     * @param _amount 新捐贈金額
      */
-    function calculateTier(uint256 _amount) public pure returns (string memory) {
-        if (_amount >= 1 ether) return "Diamond";
-        if (_amount >= 0.5 ether) return "Gold";
-        if (_amount >= 0.1 ether) return "Silver";
-        return "Bronze";
+    function updateSupporterMetadata(
+        uint256 _tokenId,
+        uint256 _amount
+    ) external onlyOwner {
+        require(_exists(_tokenId), "NFT does not exist");
+        
+        SupporterMetadata storage metadata = _supporterMetadata[_tokenId];
+        metadata.amount = _amount;
+        
+        emit SupporterMetadataUpdated(
+            metadata.supporter,
+            _tokenId,
+            _amount,
+            block.timestamp
+        );
     }
 
     /**
@@ -113,23 +124,13 @@ contract SupporterNFT is ERC721, ERC721URIStorage, Ownable {
     }
 
     /**
-     * @dev 獲取支持者的所有 NFT
+     * @dev 獲取支持者的 NFT ID
      * @param _supporter 支持者地址
      * @param _creator 創作者地址
-     * @return 支持者的 NFT ID 數組
+     * @return NFT ID
      */
-    function getSupporterTokens(address _supporter, address _creator) external view returns (uint256[] memory) {
-        return supporterToCreatorTokens[_supporter][_creator];
-    }
-
-    /**
-     * @dev 獲取支持者的所有 NFT 數量
-     * @param _supporter 支持者地址
-     * @param _creator 創作者地址
-     * @return NFT 數量
-     */
-    function getSupporterTokenCount(address _supporter, address _creator) external view returns (uint256) {
-        return supporterToCreatorTokens[_supporter][_creator].length;
+    function getSupporterTokenId(address _supporter, address _creator) external view returns (uint256) {
+        return supporterToCreatorTokenId[_supporter][_creator];
     }
 
     // 重寫必要的函數

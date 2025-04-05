@@ -13,12 +13,25 @@ export const Layout = ({ children }: LayoutProps) => {
       <header className="relative z-10 w-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm shadow-sm border-b border-gray-200 dark:border-gray-700">
         <nav className="container-custom">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-8">
               <h1 className="text-2xl font-bold gradient-text">CreatorsHub</h1>
+              <div className="hidden sm:flex space-x-6">
+                <a href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                  首頁
+                </a>
+                {/* 未來可以在這裡添加更多導航連結 */}
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <ConnectButton />
             </div>
+          </div>
+          {/* 手機版導航 */}
+          <div className="sm:hidden py-2 -mt-1 flex space-x-6">
+            <a href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              首頁
+            </a>
+            {/* 未來可以在這裡添加更多導航連結 */}
           </div>
         </nav>
       </header>

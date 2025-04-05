@@ -31,6 +31,9 @@ export const Layout = ({ children }: LayoutProps) => {
                 <a href="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                   收入管理
                 </a>
+                <a href="/withdraw" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                  提款
+                </a>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -53,6 +56,9 @@ export const Layout = ({ children }: LayoutProps) => {
             </a>
             <a href="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               收入管理
+            </a>
+            <a href="/withdraw" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              提款
             </a>
           </div>
         </nav>

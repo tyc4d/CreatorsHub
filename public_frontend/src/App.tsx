@@ -3,6 +3,7 @@ import { Donate } from './pages/Donate';
 import { TransactionHistory } from './pages/TransactionHistory';
 import { CreatorGallery } from './pages/CreatorGallery';
 import { QRGenerator } from './pages/QRGenerator';
+import { Dashboard } from './pages/Dashboard';
 import { WagmiConfig, createConfig, http } from 'wagmi';
 import { sepolia, mainnet, optimism, polygon } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -36,6 +37,7 @@ function App() {
                 <Route path="/history" element={<TransactionHistory />} />
                 <Route path="/gallery" element={<CreatorGallery />} />
                 <Route path="/qr" element={<QRGenerator />} />
+                <Route path="/dashboard" element={<Dashboard />} />
               </Routes>
             </Layout>
           </Router>

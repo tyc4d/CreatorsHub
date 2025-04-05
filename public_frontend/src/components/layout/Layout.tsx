@@ -28,6 +28,9 @@ export const Layout = ({ children }: LayoutProps) => {
                 <a href="/qr" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                   QR 碼生成器
                 </a>
+                <a href="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                  收入管理
+                </a>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -47,6 +50,9 @@ export const Layout = ({ children }: LayoutProps) => {
             </a>
             <a href="/qr" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               QR 碼生成器
+            </a>
+            <a href="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              收入管理
             </a>
           </div>
         </nav>

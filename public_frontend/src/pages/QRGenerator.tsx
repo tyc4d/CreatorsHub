@@ -44,7 +44,7 @@ interface QRCodeStyle {
 const templates: Template[] = [
   {
     id: 'eth-dark',
-    name: '以太坊暗色',
+    name: 'Ethereum Dark',
     icon: <FaEthereum className="w-6 h-6" />,
     style: {
       containerClass: 'bg-gray-900 p-8 rounded-2xl shadow-xl',
@@ -59,7 +59,7 @@ const templates: Template[] = [
   },
   {
     id: 'kofi-style',
-    name: 'Ko-fi 風格',
+    name: 'Ko-fi Style',
     icon: <SiKofi className="w-6 h-6" />,
     style: {
       containerClass: 'bg-blue-500 p-8 rounded-2xl shadow-xl',
@@ -74,7 +74,7 @@ const templates: Template[] = [
   },
   {
     id: 'coffee',
-    name: '買杯咖啡',
+    name: 'Buy Me a Coffee',
     icon: <SiBuymeacoffee className="w-6 h-6" />,
     style: {
       containerClass: 'bg-yellow-500 p-8 rounded-2xl shadow-xl',
@@ -89,7 +89,7 @@ const templates: Template[] = [
   },
   {
     id: 'patreon',
-    name: 'Patreon 風格',
+    name: 'Patreon Style',
     icon: <SiPatreon className="w-6 h-6" />,
     style: {
       containerClass: 'bg-red-600 p-8 rounded-2xl shadow-xl',
@@ -206,8 +206,8 @@ export const QRGenerator = () => {
 
   // 生成 CreatorsHub 個人頁面連結
   const creatorProfileUrl = address 
-    ? `https://creatorshub.com/s/${address}` 
-    : 'https://creatorshub.com/s/connect-wallet';
+    ? `http://localhost:5173/s/${address}` 
+    : 'http://localhost:5173/s/connect-wallet';
 
   // 複製連結到剪貼板
   const copyToClipboard = () => {
@@ -227,19 +227,19 @@ export const QRGenerator = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* 控制面板 */}
+        {/* Control Panel */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"
         >
-          <h2 className="text-2xl font-semibold mb-6">自定義設置</h2>
+          <h2 className="text-2xl font-semibold mb-6">Custom Settings</h2>
           
           <div className="space-y-6">
-            {/* 模板選擇 */}
+            {/* Template Selection */}
             <div>
               <label className="block text-sm font-medium mb-4">
-                選擇模板
+                Select Template
               </label>
               <div className="grid grid-cols-2 gap-4">
                 {templates.map((template) => (
@@ -261,14 +261,14 @@ export const QRGenerator = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                贊助連結
+                Donation Link
               </label>
               <input
                 type="text"
                 value={qrStyle.value}
                 onChange={(e) => setQrStyle({ ...qrStyle, value: e.target.value })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
-                placeholder="輸入您的贊助連結"
+                placeholder="Enter your donation link"
               />
             </div>
 
@@ -300,7 +300,7 @@ export const QRGenerator = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                QR 碼大小 ({qrStyle.size}x{qrStyle.size})
+                QR Code Size ({qrStyle.size}x{qrStyle.size})
               </label>
               <input
                 type="range"
@@ -315,7 +315,7 @@ export const QRGenerator = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                品牌標誌
+                Brand Logo
               </label>
               <input
                 type="file"
@@ -331,19 +331,19 @@ export const QRGenerator = () => {
                 className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
               >
                 <BiReset className="w-5 h-5 mr-2" />
-                重置
+                Reset
               </button>
             </div>
           </div>
         </motion.div>
 
-        {/* 預覽和匯出 */}
+        {/* Preview and Export */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"
         >
-          <h2 className="text-2xl font-semibold mb-6">預覽與匯出</h2>
+          <h2 className="text-2xl font-semibold mb-6">Preview & Export</h2>
           
           <div className="flex flex-col items-center space-y-6">
             <div
@@ -362,7 +362,7 @@ export const QRGenerator = () => {
                 <QRCodeSVG {...qrStyle} />
               </div>
               <div className={`mt-4 text-center ${selectedTemplate.style.textClass} text-sm opacity-60`}>
-                由 CreatorsHub 提供支持
+                Powered by CreatorsHub
               </div>
             </div>
 

@@ -35,7 +35,7 @@ interface CreatorInfo {
 export const Withdraw = () => {
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [creatorInfo] = useState<CreatorInfo>({
-    name: '數位創作者',
+    name: 'Digital Creator',
     avatar: 'https://i.pravatar.cc/150?img=3',
     youtubeChannel: 'UCxxxxxxxxxx',
   });
@@ -84,14 +84,14 @@ export const Withdraw = () => {
     <div className="w-full max-w-4xl mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold gradient-text mb-4">
-          提款管理
+          Withdrawal Management
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          管理和提取您的創作收入
+          Manage and withdraw your creation income
         </p>
       </div>
 
-      {/* 創作者資訊卡片 */}
+      {/* Creator Info Card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -118,7 +118,7 @@ export const Withdraw = () => {
           <div className="flex items-center space-x-2">
             <BiWallet className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {displayAddress || '未連接錢包'}
+              {displayAddress || 'Wallet Not Connected'}
             </span>
           </div>
         </div>
@@ -132,7 +132,7 @@ export const Withdraw = () => {
       >
         <div className="text-center mb-8">
           <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-400">
-            可提領金額
+            Withdrawable Amount
           </h3>
           <div className="flex items-center justify-center mt-4">
             <FaEthereum className="w-8 h-8 text-primary-600" />
@@ -148,7 +148,7 @@ export const Withdraw = () => {
           <div className="flex items-center space-x-2 mb-4">
             <BiWallet className="w-6 h-6 text-gray-600 dark:text-gray-400" />
             <span className="text-gray-600 dark:text-gray-400">
-              目標錢包餘額：{walletBalance?.formatted || '0.00'} ETH
+              Target Wallet Balance: {walletBalance?.formatted || '0.00'} ETH
             </span>
           </div>
           <button
@@ -169,11 +169,11 @@ export const Withdraw = () => {
                 處理中...
               </span>
             ) : !isConnected ? (
-              '請先連接錢包'
+              'Please Connect Wallet First'
             ) : !withdrawableAmount || formattedWithdrawableAmount === '0.00' ? (
-              '目前沒有可提領的金額'
+              'No Withdrawable Amount Available'
             ) : (
-              '提領到錢包'
+              'Withdraw to Wallet'
             )}
           </button>
         </div>

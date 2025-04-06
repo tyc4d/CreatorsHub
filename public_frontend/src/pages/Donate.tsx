@@ -17,29 +17,29 @@ interface Token {
   tags: string[];
 }
 
-// 模擬 NFT 元數據
+// Mock NFT metadata
 const MOCK_NFT = {
-  name: "CreatorsHub 創作者 NFT",
-  description: "這是一個代表 CreatorsHub 創作者身份的 NFT，持有者可以獲得平台上的特殊權益。",
+  name: "CreatorsHub Creator NFT",
+  description: "This is an NFT representing CreatorsHub creator identity, holders can receive special benefits on the platform.",
   image: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
   attributes: [
-    { trait_type: "等級", value: "黃金" },
-    { trait_type: "加入日期", value: "2023-06-15" },
-    { trait_type: "贊助總額", value: "1.5 ETH" },
-    { trait_type: "支持者數量", value: "42" }
+    { trait_type: "Level", value: "Gold" },
+    { trait_type: "Join Date", value: "2023-06-15" },
+    { trait_type: "Total Donation", value: "1.5 ETH" },
+    { trait_type: "Supporter Count", value: "42" }
   ]
 };
 
-// 模擬贊助者 NFT 元數據
+// Mock Supporter NFT metadata
 const MOCK_SUPPORTER_NFT = {
-  name: "CreatorsHub 支持者 NFT",
-  description: "這是一個代表 CreatorsHub 支持者身份的 NFT，持有者可以獲得平台上的特殊權益。",
+  name: "CreatorsHub Supporter NFT",
+  description: "This is an NFT representing CreatorsHub supporter identity, holders can receive special benefits on the platform.",
   image: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
   attributes: [
-    { trait_type: "等級", value: "支持者" },
-    { trait_type: "贊助日期", value: new Date().toLocaleDateString() },
-    { trait_type: "贊助金額", value: "0 ETH" },
-    { trait_type: "支持創作者", value: "未指定" }
+    { trait_type: "Level", value: "Supporter" },
+    { trait_type: "Donation Date", value: new Date().toLocaleDateString() },
+    { trait_type: "Donation Amount", value: "0 ETH" },
+    { trait_type: "Supported Creator", value: "Not Specified" }
   ]
 };
 
@@ -76,17 +76,17 @@ export const Donate = () => {
     watch: true,
   });
 
-  // 獲取創作者信息
+  // Get creator information
   useEffect(() => {
     const fetchCreatorInfo = async () => {
       if (!creatorAddress) return;
       
       try {
-        // 這裡應該從 API 獲取創作者信息
-        // 目前使用模擬數據
+        // Here should fetch creator info from API
+        // Currently using mock data
         setCreatorInfo({
-          name: `創作者 ${creatorAddress.slice(0, 6)}...${creatorAddress.slice(-4)}`,
-          bio: '這是一位優秀的創作者，支持他們的創作吧！'
+          name: `Creator ${creatorAddress.slice(0, 6)}...${creatorAddress.slice(-4)}`,
+          bio: 'This is an excellent creator, support their creation!'
         });
       } catch (error) {
         console.error('Error fetching creator info:', error);
@@ -96,18 +96,18 @@ export const Donate = () => {
     fetchCreatorInfo();
   }, [creatorAddress]);
 
-  // 獲取 NFT 元數據
+  // Get NFT metadata
   useEffect(() => {
     const fetchNftMetadata = async () => {
       if (!creatorAddress) return;
       
       setIsLoadingNft(true);
       try {
-        // 模擬 API 延遲
+        // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // 這裡應該從 API 獲取 NFT 元數據
-        // 目前使用模擬數據
+        // Here should fetch NFT metadata from API
+        // Currently using mock data
         setNftMetadata(MOCK_NFT);
       } catch (error) {
         console.error('Error fetching NFT metadata:', error);
@@ -119,7 +119,7 @@ export const Donate = () => {
     fetchNftMetadata();
   }, [creatorAddress]);
 
-  // 獲取代幣 USD 價格
+  // Get token USD price
   useEffect(() => {
     const fetchTokenPrice = async () => {
       if (!selectedToken) return;
@@ -155,27 +155,27 @@ export const Donate = () => {
     fetchTokenPrice();
   }, [selectedToken]);
 
-  // 更新餘額顯示
+  // Update balance display
   useEffect(() => {
     if (balance) {
       setTokenBalance(formatUnits(balance.value, balance.decimals));
     }
   }, [balance]);
 
-  // 更新贊助者 NFT 元數據
+  // Update supporter NFT metadata
   useEffect(() => {
     if (amount && selectedToken && creatorInfo) {
       setIsLoadingSupporterNft(true);
       
-      // 模擬 API 延遲
+      // Simulate API delay
       setTimeout(() => {
         const updatedNft = {
           ...MOCK_SUPPORTER_NFT,
           attributes: [
-            { trait_type: "等級", value: getSupporterTier(parseFloat(amount)) },
-            { trait_type: "贊助日期", value: new Date().toLocaleDateString() },
-            { trait_type: "贊助金額", value: `${amount} ${selectedToken.symbol}` },
-            { trait_type: "支持創作者", value: creatorInfo.name }
+            { trait_type: "Level", value: getSupporterTier(parseFloat(amount)) },
+            { trait_type: "Donation Date", value: new Date().toLocaleDateString() },
+            { trait_type: "Donation Amount", value: `${amount} ${selectedToken.symbol}` },
+            { trait_type: "Supported Creator", value: creatorInfo.name }
           ]
         };
         
@@ -185,27 +185,27 @@ export const Donate = () => {
     }
   }, [amount, selectedToken, creatorInfo]);
 
-  // 根據贊助金額獲取支持者等級
+  // Get supporter tier based on donation amount
   const getSupporterTier = (amount: number) => {
-    if (amount >= 0.1) return "鑽石支持者";
-    if (amount >= 0.05) return "黃金支持者";
-    if (amount >= 0.01) return "白銀支持者";
-    return "銅牌支持者";
+    if (amount >= 0.1) return "Diamond Supporter";
+    if (amount >= 0.05) return "Gold Supporter";
+    if (amount >= 0.01) return "Silver Supporter";
+    return "Bronze Supporter";
   };
 
   const suggestedAmounts = [
-    { value: '0.01', label: '0.01 ETH', tier: '銅牌贊助' },
-    { value: '0.05', label: '0.05 ETH', tier: '銀牌贊助' },
-    { value: '0.1', label: '0.1 ETH', tier: '金牌贊助' },
+    { value: '0.01', label: '0.01 ETH', tier: 'Bronze Donation' },
+    { value: '0.05', label: '0.05 ETH', tier: 'Silver Donation' },
+    { value: '0.1', label: '0.1 ETH', tier: 'Gold Donation' },
   ];
 
   const handleDonateClick = () => {
     if (!amount) {
-      alert('請輸入贊助金額');
+      alert('Please enter donation amount');
       return;
     }
     if (!selectedToken?.chainId) {
-      alert('請選擇代幣');
+      alert('Please select token');
       return;
     }
     setIsSwapModalOpen(true);
@@ -213,7 +213,7 @@ export const Donate = () => {
 
   const handleSwapConfirm = () => {
     setIsSwapModalOpen(false);
-    // 處理贊助確認邏輯
+    // Process donation confirmation logic
   };
 
   const handleTokenSelect = (token: Token) => {
@@ -225,7 +225,7 @@ export const Donate = () => {
     <div className="w-full max-w-4xl mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold gradient-text mb-4">
-          {creatorAddress ? `贊助 ${creatorInfo?.name || '創作者'}` : '贊助創作者'}
+          {creatorAddress ? `Donate to ${creatorInfo?.name || 'Creator'}` : 'Donate to Creator'}
         </h1>
         {creatorInfo && (
           <p className="text-gray-600 dark:text-gray-400 mb-4">
@@ -234,13 +234,13 @@ export const Donate = () => {
         )}
         {creatorAddress && (
           <p className="text-sm text-gray-500 dark:text-gray-500">
-            創作者地址: {creatorAddress}
+            Creator Address: {creatorAddress}
           </p>
         )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* NFT 顯示區域 */}
+        {/* NFT Display Area */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -249,7 +249,7 @@ export const Donate = () => {
         >
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold">NFT 預覽</h2>
+              <h2 className="text-2xl font-bold">NFT Preview</h2>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setShowSupporterNft(false)}
@@ -259,7 +259,7 @@ export const Donate = () => {
                       : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                   }`}
                 >
-                  創作者 NFT
+                  Creator NFT
                 </button>
                 <button
                   onClick={() => setShowSupporterNft(true)}
@@ -269,7 +269,7 @@ export const Donate = () => {
                       : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                   }`}
                 >
-                  支持者 NFT
+                  Supporter NFT
                 </button>
               </div>
             </div>
@@ -278,7 +278,7 @@ export const Donate = () => {
               isLoadingNft ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
-                  <p className="text-gray-600 dark:text-gray-400">載入 NFT 資料中...</p>
+                  <p className="text-gray-600 dark:text-gray-400">Loading NFT data...</p>
                 </div>
               ) : nftMetadata ? (
                 <div className="space-y-4">
@@ -306,14 +306,14 @@ export const Donate = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <p className="text-gray-600 dark:text-gray-400">無法載入 NFT 資料</p>
+                  <p className="text-gray-600 dark:text-gray-400">Unable to load NFT data</p>
                 </div>
               )
             ) : (
               isLoadingSupporterNft ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
-                  <p className="text-gray-600 dark:text-gray-400">載入支持者 NFT 資料中...</p>
+                  <p className="text-gray-600 dark:text-gray-400">Loading Supporter NFT data...</p>
                 </div>
               ) : supporterNftMetadata ? (
                 <div className="space-y-4">
@@ -341,32 +341,32 @@ export const Donate = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <p className="text-gray-600 dark:text-gray-400">請輸入贊助金額以預覽您的 NFT</p>
+                  <p className="text-gray-600 dark:text-gray-400">Please enter donation amount to preview your NFT</p>
                 </div>
               )
             )}
           </div>
         </motion.div>
 
-        {/* 贊助表單區域 */}
+        {/* Donation Form Area */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6"
         >
-          <h2 className="text-2xl font-bold mb-6">贊助表單</h2>
+          <h2 className="text-2xl font-bold mb-6">Donation Form</h2>
           
           <div className="space-y-6">
-            {/* 金額輸入 */}
+            {/* Amount Input */}
             <div>
-              <label className="block text-sm font-medium mb-2">贊助金額</label>
+              <label className="block text-sm font-medium mb-2">Donation Amount</label>
               <div className="relative">
                 <input
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  placeholder="輸入金額"
+                  placeholder="Enter amount"
                   className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -374,7 +374,7 @@ export const Donate = () => {
                 </div>
               </div>
               
-              {/* 快速金額選擇 */}
+              {/* Quick Amount Selection */}
               <div className="grid grid-cols-3 gap-2 mt-2">
                 {suggestedAmounts.map((suggestion) => (
                   <button
@@ -392,9 +392,9 @@ export const Donate = () => {
               </div>
             </div>
             
-            {/* 代幣選擇 */}
+            {/* Token Selection */}
             <div>
-              <label className="block text-sm font-medium mb-2">選擇代幣</label>
+              <label className="block text-sm font-medium mb-2">Select Token</label>
               <button
                 onClick={() => setIsTokenSelectorOpen(true)}
                 className="w-full px-4 py-3 border rounded-lg flex items-center justify-between hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
@@ -423,21 +423,21 @@ export const Donate = () => {
                 <FaChevronDown className="text-gray-400" />
               </button>
               
-              {/* 餘額顯示 */}
+              {/* Balance Display */}
               {selectedToken && (
                 <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex justify-between">
-                  <span>餘額: {isLoadingBalance ? '載入中...' : `${tokenBalance} ${selectedToken.symbol}`}</span>
-                  <span>≈ ${isLoadingBalance ? '載入中...' : (parseFloat(tokenBalance) * parseFloat(usdValue)).toFixed(2)} USD</span>
+                  <span>Balance: {isLoadingBalance ? 'Loading...' : `${tokenBalance} ${selectedToken.symbol}`}</span>
+                  <span>≈ ${isLoadingBalance ? 'Loading...' : (parseFloat(tokenBalance) * parseFloat(usdValue)).toFixed(2)} USD</span>
                 </div>
               )}
             </div>
             
-            {/* 贊助按鈕 */}
+            {/* Donate Button */}
             <button
               onClick={handleDonateClick}
               className="w-full py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
-              贊助
+              Donate
             </button>
           </div>
         </motion.div>

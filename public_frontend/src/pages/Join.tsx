@@ -24,6 +24,7 @@ export const Join = () => {
   const [error, setError] = useState<string | null>(null);
   const [isCreator, setIsCreator] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
+  const [showRedirectMessage, setShowRedirectMessage] = useState(false);
 
   useEffect(() => {
     const checkCreatorStatus = async () => {
@@ -38,8 +39,11 @@ export const Join = () => {
           setIsCreator(isCreatorStatus);
           
           if (isCreatorStatus) {
-            // 如果已經是創作者，重定向到 dashboard
-            navigate('/dashboard');
+            // 如果已經是創作者，顯示提示訊息並延遲跳轉
+            setShowRedirectMessage(true);
+            setTimeout(() => {
+              navigate('/dashboard');
+            }, 2000); // 2秒後跳轉
             return;
           }
         } catch (error) {
@@ -80,9 +84,28 @@ export const Join = () => {
     );
   }
 
-  // 如果已經是創作者，不顯示任何內容（會被 useEffect 重定向）
-  if (isCreator) {
-    return null;
+  // 如果已經是創作者，顯示提示訊息
+  if (showRedirectMessage) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-md mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8"
+          >
+            <h1 className="text-3xl font-bold mb-4 text-primary-600">您已經是創作者</h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              正在為您跳轉到收入管理頁面...
+            </p>
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,7 +122,10 @@ export const Join = () => {
       // 先檢查是否已經是創作者
       const isCreatorStatus = await donationFactory.isCreator(account);
       if (isCreatorStatus) {
-        navigate('/dashboard');
+        setShowRedirectMessage(true);
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
         return;
       }
 
@@ -121,7 +147,10 @@ export const Join = () => {
       console.error('Error registering creator:', error);
       if (error.message?.includes('Creator already registered')) {
         setError('您已經註冊為創作者');
-        navigate('/dashboard');
+        setShowRedirectMessage(true);
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
       } else {
         setError(error.message || '註冊創作者時發生錯誤');
       }

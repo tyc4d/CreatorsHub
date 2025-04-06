@@ -35,22 +35,22 @@ interface NFT {
 const mockCreators: Creator[] = [
   {
     id: '1',
-    name: '數位藝術家小明',
+    name: 'Digital Artist Xiao Ming',
     avatar: 'https://i.pravatar.cc/150?img=1',
-    description: '專注於數位藝術創作，擅長像素風格',
+    description: 'Focused on digital art creation, specializing in pixel art style',
     nfts: [
       {
         id: 'nft1',
-        title: '像素貓咪 #1',
+        title: 'Pixel Cat #1',
         image: 'https://picsum.photos/400/400?random=1',
-        description: '獨特的像素風格貓咪藝術',
+        description: 'Unique pixel art style cat',
         price: '0.1'
       },
       {
         id: 'nft2',
-        title: '像素狗狗 #1',
+        title: 'Pixel Dog #1',
         image: 'https://picsum.photos/400/400?random=2',
-        description: '可愛的像素風格狗狗',
+        description: 'Cute pixel art style dog',
         price: '0.15'
       }
     ],
@@ -88,9 +88,9 @@ export const CreatorGallery = () => {
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold gradient-text mb-4">創作者畫廊</h1>
+        <h1 className="text-4xl font-bold gradient-text mb-4">Creator Gallery</h1>
         <p className="text-gray-600 dark:text-gray-400">
-          探索優秀創作者的作品集，支持您喜愛的藝術家
+          Explore excellent creators' works and support your favorite artists
         </p>
       </div>
 

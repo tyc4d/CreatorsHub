@@ -71,26 +71,26 @@ interface NftMetadata {
 
 // 模擬創作者數據
 const MOCK_CREATORS = [
-  { address: '0x1234567890123456789012345678901234567890', name: '創作者 A', nftCount: 3 },
-  { address: '0x2345678901234567890123456789012345678901', name: '創作者 B', nftCount: 5 },
-  { address: '0x3456789012345678901234567890123456789012', name: '創作者 C', nftCount: 2 },
-  { address: '0x4567890123456789012345678901234567890123', name: '創作者 D', nftCount: 7 },
-  { address: '0x5678901234567890123456789012345678901234', name: '創作者 E', nftCount: 4 },
+  { address: '0x1234567890123456789012345678901234567890', name: 'Creator A', nftCount: 3 },
+  { address: '0x2345678901234567890123456789012345678901', name: 'Creator B', nftCount: 5 },
+  { address: '0x3456789012345678901234567890123456789012', name: 'Creator C', nftCount: 2 },
+  { address: '0x4567890123456789012345678901234567890123', name: 'Creator D', nftCount: 7 },
+  { address: '0x5678901234567890123456789012345678901234', name: 'Creator E', nftCount: 4 },
 ];
 
 // 模擬 NFT 元數據
 const MOCK_NFT_METADATA: Record<string, NftMetadata[]> = {
   '0x1234567890123456789012345678901234567890': [
-    { tokenId: '1', name: '支持者 NFT #1', description: '支持創作者 A 的 NFT', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "贊助金額", value: "0.05 ETH" }, { trait_type: "贊助日期", value: "2023-06-15" }] },
-    { tokenId: '2', name: '支持者 NFT #2', description: '支持創作者 A 的 NFT', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "贊助金額", value: "0.1 ETH" }, { trait_type: "贊助日期", value: "2023-07-20" }] },
-    { tokenId: '3', name: '支持者 NFT #3', description: '支持創作者 A 的 NFT', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "贊助金額", value: "0.15 ETH" }, { trait_type: "贊助日期", value: "2023-08-10" }] },
+    { tokenId: '1', name: 'Supporter NFT #1', description: 'Supporting Creator A', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "Donation Amount", value: "0.05 ETH" }, { trait_type: "Donation Date", value: "2023-06-15" }] },
+    { tokenId: '2', name: 'Supporter NFT #2', description: 'Supporting Creator A', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "Donation Amount", value: "0.1 ETH" }, { trait_type: "Donation Date", value: "2023-07-20" }] },
+    { tokenId: '3', name: 'Supporter NFT #3', description: 'Supporting Creator A', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "Donation Amount", value: "0.15 ETH" }, { trait_type: "Donation Date", value: "2023-08-10" }] },
   ],
   '0x2345678901234567890123456789012345678901': [
-    { tokenId: '1', name: '支持者 NFT #1', description: '支持創作者 B 的 NFT', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "贊助金額", value: "0.02 ETH" }, { trait_type: "贊助日期", value: "2023-06-05" }] },
-    { tokenId: '2', name: '支持者 NFT #2', description: '支持創作者 B 的 NFT', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "贊助金額", value: "0.05 ETH" }, { trait_type: "贊助日期", value: "2023-07-15" }] },
-    { tokenId: '3', name: '支持者 NFT #3', description: '支持創作者 B 的 NFT', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "贊助金額", value: "0.08 ETH" }, { trait_type: "贊助日期", value: "2023-08-01" }] },
-    { tokenId: '4', name: '支持者 NFT #4', description: '支持創作者 B 的 NFT', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "贊助金額", value: "0.12 ETH" }, { trait_type: "贊助日期", value: "2023-09-10" }] },
-    { tokenId: '5', name: '支持者 NFT #5', description: '支持創作者 B 的 NFT', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "贊助金額", value: "0.15 ETH" }, { trait_type: "贊助日期", value: "2023-10-05" }] },
+    { tokenId: '1', name: 'Supporter NFT #1', description: 'Supporting Creator B', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "Donation Amount", value: "0.02 ETH" }, { trait_type: "Donation Date", value: "2023-06-05" }] },
+    { tokenId: '2', name: 'Supporter NFT #2', description: 'Supporting Creator B', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "Donation Amount", value: "0.05 ETH" }, { trait_type: "Donation Date", value: "2023-07-15" }] },
+    { tokenId: '3', name: 'Supporter NFT #3', description: 'Supporting Creator B', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "Donation Amount", value: "0.08 ETH" }, { trait_type: "Donation Date", value: "2023-08-01" }] },
+    { tokenId: '4', name: 'Supporter NFT #4', description: 'Supporting Creator B', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "Donation Amount", value: "0.12 ETH" }, { trait_type: "Donation Date", value: "2023-09-10" }] },
+    { tokenId: '5', name: 'Supporter NFT #5', description: 'Supporting Creator B', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', attributes: [{ trait_type: "Donation Amount", value: "0.15 ETH" }, { trait_type: "Donation Date", value: "2023-10-05" }] },
   ],
 };
 
@@ -260,10 +260,10 @@ export const TransactionHistory = () => {
   // 獲取交易類型的中文顯示
   const getTransactionTypeDisplay = (type: string) => {
     const typeMap: { [key: string]: string } = {
-      'Receive': '收到',
-      'Send': '發送',
-      'SwapExactInput': '兌換',
-      'Transfer': '轉帳',
+      'Receive': 'Received',
+      'Send': 'Sent',
+      'SwapExactInput': 'Swapped',
+      'Transfer': 'Transferred',
     };
     return typeMap[type] || type;
   };
@@ -283,18 +283,18 @@ export const TransactionHistory = () => {
     >
       <div className="space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-4">交易歷史</h2>
-          <p className="text-gray-600 dark:text-gray-400">查看和管理您的所有交易記錄</p>
+          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-4">Transaction History</h2>
+          <p className="text-gray-600 dark:text-gray-400">View and manage all your transaction records</p>
         </div>
 
-        {/* NFT 收藏區域 */}
+        {/* NFT Collection Area */}
         <div className="card p-6">
-          <h3 className="text-xl font-semibold mb-4">您的支持者 NFT 收藏</h3>
+          <h3 className="text-xl font-semibold mb-4">Your Supporter NFT Collection</h3>
           
           {isLoadingNfts ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400">載入 NFT 收藏中...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading NFT collection...</p>
             </div>
           ) : userNfts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -311,12 +311,12 @@ export const TransactionHistory = () => {
                     <h4 className="font-bold text-lg">{nft.name}</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{nft.description}</p>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">創作者: {nft.creatorName}</span>
+                      <span className="text-sm font-medium">Creator: {nft.creatorName}</span>
                       <button 
                         onClick={() => handleFilterChange('creator', nft.creatorAddress)}
                         className="text-xs bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 px-2 py-1 rounded"
                       >
-                        查看交易
+                        View Transactions
                       </button>
                     </div>
                     {nft.attributes.map((attr: any, attrIndex: number) => (
@@ -331,30 +331,30 @@ export const TransactionHistory = () => {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">您還沒有支持者 NFT</p>
+              <p className="text-gray-600 dark:text-gray-400">You don't have any supporter NFTs yet</p>
             </div>
           )}
         </div>
 
-        {/* 篩選器 */}
+        {/* Filters */}
         <div className="card p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold">篩選條件</h3>
+            <h3 className="text-xl font-semibold">Filters</h3>
             <button 
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center text-primary-600 dark:text-primary-400"
             >
               {showFilters ? <FaTimes className="mr-1" /> : <FaFilter className="mr-1" />}
-              {showFilters ? '隱藏篩選' : '顯示篩選'}
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
             </button>
           </div>
           
           {showFilters && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* 時間範圍 */}
+                {/* Date Range */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">時間範圍</label>
+                  <label className="block text-sm font-medium">Date Range</label>
                   <input
                     type="date"
                     className="input"
@@ -369,20 +369,20 @@ export const TransactionHistory = () => {
                   />
                 </div>
 
-                {/* 金額範圍 */}
+                {/* Amount Range */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">金額範圍</label>
+                  <label className="block text-sm font-medium">Amount Range</label>
                   <div className="flex space-x-2">
                     <input
                       type="number"
-                      placeholder="最小值"
+                      placeholder="Min"
                       className="input"
                       value={filters.amountRange.min}
                       onChange={(e) => handleFilterChange('amountRange', { ...filters.amountRange, min: e.target.value })}
                     />
                     <input
                       type="number"
-                      placeholder="最大值"
+                      placeholder="Max"
                       className="input"
                       value={filters.amountRange.max}
                       onChange={(e) => handleFilterChange('amountRange', { ...filters.amountRange, max: e.target.value })}
@@ -390,29 +390,29 @@ export const TransactionHistory = () => {
                   </div>
                 </div>
 
-                {/* 代幣類型 */}
+                {/* Token Type */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">代幣類型</label>
+                  <label className="block text-sm font-medium">Token Type</label>
                   <select
                     className="select"
                     value={filters.token}
                     onChange={(e) => handleFilterChange('token', e.target.value)}
                   >
-                    <option value="">全部</option>
+                    <option value="">All</option>
                     <option value="0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee">ETH</option>
                     <option value="0x7f5c764cbc14f9669b88837ca1490cca17c31607">USDC</option>
                   </select>
                 </div>
 
-                {/* 創作者 */}
+                {/* Creator */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">創作者</label>
+                  <label className="block text-sm font-medium">Creator</label>
                   <select
                     className="select"
                     value={filters.creator}
                     onChange={(e) => handleFilterChange('creator', e.target.value)}
                   >
-                    <option value="">全部</option>
+                    <option value="">All</option>
                     {MOCK_CREATORS.map((creator, index) => (
                       <option key={index} value={creator.address}>{creator.name}</option>
                     ))}
@@ -425,18 +425,18 @@ export const TransactionHistory = () => {
                   onClick={clearFilters}
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  清除篩選
+                  Clear Filters
                 </button>
               </div>
             </div>
           )}
           
-          {/* 當前篩選標籤 */}
+          {/* Current Filter Tags */}
           {(filters.creator || filters.token || filters.dateRange.start || filters.dateRange.end) && (
             <div className="mt-4 flex flex-wrap gap-2">
               {filters.creator && (
                 <div className="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 px-3 py-1 rounded-full text-sm flex items-center">
-                  <span>創作者: {getCreatorName(filters.creator)}</span>
+                  <span>Creator: {getCreatorName(filters.creator)}</span>
                   <button 
                     onClick={() => handleFilterChange('creator', '')}
                     className="ml-2 text-primary-600 dark:text-primary-400"
@@ -448,7 +448,7 @@ export const TransactionHistory = () => {
               
               {filters.token && (
                 <div className="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 px-3 py-1 rounded-full text-sm flex items-center">
-                  <span>代幣: {filters.token === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? 'ETH' : 'USDC'}</span>
+                  <span>Token: {filters.token === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? 'ETH' : 'USDC'}</span>
                   <button 
                     onClick={() => handleFilterChange('token', '')}
                     className="ml-2 text-primary-600 dark:text-primary-400"
@@ -460,7 +460,7 @@ export const TransactionHistory = () => {
               
               {filters.dateRange.start && (
                 <div className="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 px-3 py-1 rounded-full text-sm flex items-center">
-                  <span>開始日期: {filters.dateRange.start}</span>
+                  <span>Start Date: {filters.dateRange.start}</span>
                   <button 
                     onClick={() => handleFilterChange('dateRange', { ...filters.dateRange, start: '' })}
                     className="ml-2 text-primary-600 dark:text-primary-400"
@@ -472,7 +472,7 @@ export const TransactionHistory = () => {
               
               {filters.dateRange.end && (
                 <div className="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 px-3 py-1 rounded-full text-sm flex items-center">
-                  <span>結束日期: {filters.dateRange.end}</span>
+                  <span>End Date: {filters.dateRange.end}</span>
                   <button 
                     onClick={() => handleFilterChange('dateRange', { ...filters.dateRange, end: '' })}
                     className="ml-2 text-primary-600 dark:text-primary-400"
@@ -485,22 +485,22 @@ export const TransactionHistory = () => {
           )}
         </div>
 
-        {/* 載入中狀態 */}
+        {/* Loading State */}
         {isLoading && (
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">載入交易歷史中...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading transaction history...</p>
           </div>
         )}
 
-        {/* 錯誤訊息 */}
+        {/* Error Message */}
         {error && (
           <div className="text-center py-8">
             <p className="text-red-600 dark:text-red-400">{error}</p>
           </div>
         )}
 
-        {/* 交易列表 */}
+        {/* Transaction List */}
         <div className="space-y-4">
           {transactions.length > 0 ? (
             transactions.map((tx) => (
@@ -514,8 +514,8 @@ export const TransactionHistory = () => {
                         tx.details.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-red-100 text-red-800'
                       }`}>
-                        {tx.details.status === 'completed' ? '已完成' :
-                         tx.details.status === 'pending' ? '處理中' : '失敗'}
+                        {tx.details.status === 'completed' ? 'Completed' :
+                         tx.details.status === 'pending' ? 'Processing' : 'Failed'}
                       </span>
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -531,11 +531,11 @@ export const TransactionHistory = () => {
                         <div className={`text-lg font-semibold ${
                           action.direction === 'In' ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {action.direction === 'In' ? '收到' : '發送'} {formatAmount(action)}
+                          {action.direction === 'In' ? 'Received' : 'Sent'} {formatAmount(action)}
                         </div>
                         {action.standard === 'ERC721' && (
                           <div className="text-sm text-gray-500">
-                            合約地址: {action.address}
+                            Contract: {action.address}
                           </div>
                         )}
                       </div>
@@ -548,7 +548,7 @@ export const TransactionHistory = () => {
                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-500">從：</span>
+                      <span className="text-gray-500">From:</span>
                       <span className="font-mono">{tx.details.fromAddress}</span>
                       {MOCK_CREATORS.some(c => c.address.toLowerCase() === tx.details.fromAddress.toLowerCase()) && (
                         <span className="ml-2 text-primary-600 dark:text-primary-400">
@@ -557,7 +557,7 @@ export const TransactionHistory = () => {
                       )}
                     </div>
                     <div>
-                      <span className="text-gray-500">至：</span>
+                      <span className="text-gray-500">To:</span>
                       <span className="font-mono">{tx.details.toAddress}</span>
                       {MOCK_CREATORS.some(c => c.address.toLowerCase() === tx.details.toAddress.toLowerCase()) && (
                         <span className="ml-2 text-primary-600 dark:text-primary-400">
@@ -571,7 +571,7 @@ export const TransactionHistory = () => {
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">沒有找到符合條件的交易記錄</p>
+              <p className="text-gray-600 dark:text-gray-400">No transactions found matching the criteria</p>
             </div>
           )}
         </div>

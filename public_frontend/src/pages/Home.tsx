@@ -9,61 +9,61 @@ export const Home = () => {
   const features = [
     {
       icon: <FaWallet className="w-8 h-8 text-primary-500" />,
-      title: "無痛收款",
-      description: "只需連接錢包，即可開始接收來自全球的支持者贊助，無需複雜設置。"
+      title: "Easy Receiving",
+      description: "Just connect your wallet to start receiving donations from supporters worldwide, no complex setup required."
     },
     {
       icon: <FaExchangeAlt className="w-8 h-8 text-primary-500" />,
-      title: "智能兌換",
-      description: "利用 1inch Fusion+ 技術，自動將不同資產以最佳路徑、最低手續費兌換為您想要的資產。"
+      title: "Smart Exchange",
+      description: "Utilize 1inch Fusion+ technology to automatically exchange different assets with the best path and lowest fees."
     },
     {
       icon: <FaGlobe className="w-8 h-8 text-primary-500" />,
-      title: "全球支持",
-      description: "突破地域限制，接收來自世界各地的贊助，擴大您的支持者基礎。"
+      title: "Global Support",
+      description: "Break through geographical limitations, receive donations from around the world, and expand your supporter base."
     },
     {
       icon: <FaChartLine className="w-8 h-8 text-primary-500" />,
-      title: "透明追蹤",
-      description: "所有交易記錄公開透明，支持者可以追蹤他們的贊助流向，建立信任關係。"
+      title: "Transparent Tracking",
+      description: "All transaction records are public and transparent, allowing supporters to track their donations and build trust."
     },
     {
       icon: <FaLock className="w-8 h-8 text-primary-500" />,
-      title: "安全可靠",
-      description: "基於區塊鏈技術，確保資金安全，無需信任第三方平台。"
+      title: "Secure & Reliable",
+      description: "Based on blockchain technology, ensuring fund security without trusting third-party platforms."
     },
     {
       icon: <FaEthereum className="w-8 h-8 text-primary-500" />,
-      title: "低手續費",
-      description: "僅需支付網絡 gas 費用，無平台抽成，讓您的收入最大化。"
+      title: "Low Fees",
+      description: "Only pay network gas fees, no platform commission, maximizing your income."
     }
   ];
 
   const comparisons = [
     {
-      feature: "手續費",
-      creatorsHub: "僅需支付網絡 gas 費用",
-      others: "平台抽成 5-20% + 支付處理費"
+      feature: "Fees",
+      creatorsHub: "Only network gas fees",
+      others: "Platform commission 5-20% + payment processing fees"
     },
     {
-      feature: "收款方式",
-      creatorsHub: "支持多種加密貨幣，自動兌換",
-      others: "僅支持法定貨幣或特定加密貨幣"
+      feature: "Payment Methods",
+      creatorsHub: "Support multiple cryptocurrencies, automatic exchange",
+      others: "Only support fiat currency or specific cryptocurrencies"
     },
     {
-      feature: "資金到賬",
-      creatorsHub: "即時到賬，無需等待平台處理",
-      others: "通常需要 3-7 個工作日"
+      feature: "Fund Settlement",
+      creatorsHub: "Instant settlement, no waiting for platform processing",
+      others: "Usually takes 3-7 business days"
     },
     {
-      feature: "全球支持",
-      creatorsHub: "無地域限制，全球支持者可直接贊助",
-      others: "受地域限制，部分國家無法使用"
+      feature: "Global Support",
+      creatorsHub: "No geographical restrictions, global supporters can donate directly",
+      others: "Subject to geographical restrictions, some countries cannot use"
     },
     {
-      feature: "透明度",
-      creatorsHub: "所有交易公開透明，可追蹤",
-      others: "資金流向不透明，難以追蹤"
+      feature: "Transparency",
+      creatorsHub: "All transactions are public and traceable",
+      others: "Fund flow is not transparent, difficult to track"
     }
   ];
 
@@ -81,7 +81,7 @@ export const Home = () => {
             >
               <span className="gradient-text">CreatorsHub</span>
               <br />
-              創作者的 Web3 贊助平台
+              Web3 Donation Platform for Creators
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -89,7 +89,7 @@ export const Home = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto"
             >
-              連接錢包，立即開始接收來自全球的支持者贊助。無需複雜設置，無需高額手續費。
+              Connect your wallet and start receiving donations from supporters worldwide. No complex setup, no high fees.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -103,13 +103,13 @@ export const Home = () => {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >
-                加入創作者
+                Join as Creator
               </Link>
               <Link 
                 to="/explore" 
                 className="px-8 py-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg text-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
               >
-                探索創作者
+                Explore Creators
               </Link>
             </motion.div>
           </div>
@@ -120,9 +120,9 @@ export const Home = () => {
       <section className="py-20 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">為什麼選擇 CreatorsHub？</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Why Choose CreatorsHub?</h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              我們為創作者提供最簡單、最經濟、最全球化的贊助解決方案
+              We provide the simplest, most economical, and most global donation solution for creators
             </p>
           </div>
           
@@ -149,9 +149,9 @@ export const Home = () => {
       <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">與傳統平台比較</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Comparison with Traditional Platforms</h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              CreatorsHub 提供更低的費用、更快的到賬和更全球化的支持
+              CreatorsHub offers lower fees, faster settlement, and more global support
             </p>
           </div>
           
@@ -159,9 +159,9 @@ export const Home = () => {
             <table className="w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
               <thead>
                 <tr className="bg-primary-50 dark:bg-primary-900/30">
-                  <th className="py-4 px-6 text-left text-gray-900 dark:text-white font-medium">功能</th>
+                  <th className="py-4 px-6 text-left text-gray-900 dark:text-white font-medium">Feature</th>
                   <th className="py-4 px-6 text-left text-gray-900 dark:text-white font-medium">CreatorsHub</th>
-                  <th className="py-4 px-6 text-left text-gray-900 dark:text-white font-medium">其他平台</th>
+                  <th className="py-4 px-6 text-left text-gray-900 dark:text-white font-medium">Other Platforms</th>
                 </tr>
               </thead>
               <tbody>
@@ -182,9 +182,9 @@ export const Home = () => {
       <section className="py-20 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">如何運作</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">How It Works</h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              只需三個簡單步驟，即可開始接收全球贊助
+              Just three simple steps to start receiving global donations
             </p>
           </div>
           
@@ -199,8 +199,8 @@ export const Home = () => {
               <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">1</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">連接錢包</h3>
-              <p className="text-gray-600 dark:text-gray-300">使用您的加密錢包登錄平台，無需註冊帳號</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Connect Wallet</h3>
+              <p className="text-gray-600 dark:text-gray-300">Log in to the platform with your crypto wallet, no account registration needed</p>
             </motion.div>
             
             <motion.div
@@ -213,8 +213,8 @@ export const Home = () => {
               <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">2</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">設置收款偏好</h3>
-              <p className="text-gray-600 dark:text-gray-300">選擇您希望接收的資產類型（目前支持 ETH）</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Set Payment Preferences</h3>
+              <p className="text-gray-600 dark:text-gray-300">Choose the asset types you want to receive (currently supporting ETH)</p>
             </motion.div>
             
             <motion.div
@@ -227,8 +227,8 @@ export const Home = () => {
               <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">3</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">開始收款</h3>
-              <p className="text-gray-600 dark:text-gray-300">分享您的個人頁面，讓支持者直接向您贊助</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Start Receiving</h3>
+              <p className="text-gray-600 dark:text-gray-300">Share your personal page and let supporters donate directly to you</p>
             </motion.div>
           </div>
         </div>
@@ -244,7 +244,7 @@ export const Home = () => {
             viewport={{ once: true }}
             className="text-3xl font-bold text-gray-900 dark:text-white mb-4"
           >
-            準備好開始您的 Web3 贊助之旅了嗎？
+            Ready to Start Your Web3 Donation Journey?
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -253,7 +253,7 @@ export const Home = () => {
             viewport={{ once: true }}
             className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto"
           >
-            加入 CreatorsHub，連接您的錢包，立即開始接收來自全球的支持者贊助。
+            Join CreatorsHub, connect your wallet, and start receiving donations from supporters worldwide.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -265,7 +265,7 @@ export const Home = () => {
               to="/join" 
               className="px-8 py-4 bg-primary-600 text-white rounded-lg text-lg font-medium hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
             >
-              立即加入
+              Join Now
             </Link>
           </motion.div>
         </div>

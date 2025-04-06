@@ -116,8 +116,8 @@ export const QRGenerator = () => {
   });
 
   const [selectedTemplate, setSelectedTemplate] = useState<Template>(templates[0]);
-  const [customText, setCustomText] = useState('支持我的創作');
-  const [customSubtext, setCustomSubtext] = useState('掃描 QR 碼進行贊助');
+  const [customText, setCustomText] = useState('Support My Creation');
+  const [customSubtext, setCustomSubtext] = useState('Scan QR Code to Donate');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const qrRef = useRef<HTMLDivElement>(null);
 
@@ -200,8 +200,8 @@ export const QRGenerator = () => {
       includeMargin: true,
     });
     setLogoFile(null);
-    setCustomText('支持我的創作');
-    setCustomSubtext('掃描 QR 碼進行贊助');
+    setCustomText('Support My Creation');
+    setCustomSubtext('Scan QR Code to Donate');
   };
 
   // 生成 CreatorsHub 個人頁面連結
@@ -219,10 +219,10 @@ export const QRGenerator = () => {
     <div className="w-full max-w-7xl mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold gradient-text mb-4">
-          贊助 QR 碼生成器
+          Donation QR Code Generator
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          創建專業的贊助 QR 碼，讓支持者更容易找到您
+          Create professional donation QR codes to make it easier for supporters to find you
         </p>
       </div>
 
@@ -274,27 +274,27 @@ export const QRGenerator = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                主標題
+                Main Title
               </label>
               <input
                 type="text"
                 value={customText}
                 onChange={(e) => setCustomText(e.target.value)}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
-                placeholder="例如：支持我的創作"
+                placeholder="e.g., Support My Creation"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                副標題
+                Subtitle
               </label>
               <input
                 type="text"
                 value={customSubtext}
                 onChange={(e) => setCustomSubtext(e.target.value)}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
-                placeholder="例如：掃描 QR 碼進行贊助"
+                placeholder="e.g., Scan QR Code to Donate"
               />
             </div>
 
@@ -368,7 +368,7 @@ export const QRGenerator = () => {
 
             {/* CreatorsHub 個人頁面連結 */}
             <div className="w-full p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <h3 className="text-lg font-medium mb-2">您的 CreatorsHub 個人頁面</h3>
+              <h3 className="text-lg font-medium mb-2">Your CreatorsHub Profile</h3>
               <div className="flex items-center">
                 <div className="flex-grow p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600 truncate">
                   {creatorProfileUrl}
@@ -376,13 +376,13 @@ export const QRGenerator = () => {
                 <button
                   onClick={copyToClipboard}
                   className="ml-2 p-2 bg-primary-500 text-white rounded hover:bg-primary-600"
-                  title="複製連結"
+                  title="Copy Link"
                 >
                   <HiLink className="w-5 h-5" />
                 </button>
               </div>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                分享此連結，讓支持者可以直接訪問您的 CreatorsHub 頁面
+                Share this link to let supporters directly access your CreatorsHub page
               </p>
             </div>
 
@@ -411,7 +411,7 @@ export const QRGenerator = () => {
             </div>
 
             <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-              提示：使用手機掃描器測試 QR 碼
+              Tip: Test the QR code with your phone scanner
             </p>
           </div>
         </motion.div>

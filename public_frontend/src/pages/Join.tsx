@@ -4,10 +4,10 @@ import { useWeb3 } from '../hooks/useWeb3';
 import { useContract } from '../hooks/useContract';
 import { useNavigate } from 'react-router-dom';
 
-// 模擬 NFT 數據
+// Mock NFT data
 const MOCK_NFT = {
   name: "CreatorsHub Membership",
-  description: "加入 CreatorsHub 成為創作者",
+  description: "Join CreatorsHub as a creator",
   image: "https://placehold.co/400x400/png",
   attributes: [
     { trait_type: "Level", value: "Creator" },
@@ -39,16 +39,16 @@ export const Join = () => {
           setIsCreator(isCreatorStatus);
           
           if (isCreatorStatus) {
-            // 如果已經是創作者，顯示提示訊息並延遲跳轉
+            // If already a creator, show message and delay redirect
             setShowRedirectMessage(true);
             setTimeout(() => {
               navigate('/dashboard');
-            }, 2000); // 2秒後跳轉
+            }, 2000); // Redirect after 2 seconds
             return;
           }
         } catch (error) {
           console.error('Error checking creator status:', error);
-          setError('檢查創作者狀態時發生錯誤');
+          setError('Error checking creator status');
         }
       }
       setIsChecking(false);
@@ -57,7 +57,7 @@ export const Join = () => {
     checkCreatorStatus();
   }, [donationFactory, account, navigate, isConnected]);
 
-  // 如果正在檢查狀態或未連接錢包，顯示加載中
+  // If checking status or wallet not connected, show loading
   if (isChecking) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -66,25 +66,25 @@ export const Join = () => {
     );
   }
 
-  // 如果未連接錢包，顯示提示
+  // If wallet not connected, show prompt
   if (!isConnected) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto text-center">
-          <h1 className="text-3xl font-bold mb-4">請先連接錢包</h1>
-          <p className="text-gray-600 mb-6">連接錢包後即可加入 CreatorsHub 成為創作者</p>
+          <h1 className="text-3xl font-bold mb-4">Please Connect Wallet</h1>
+          <p className="text-gray-600 mb-6">Connect your wallet to join CreatorsHub as a creator</p>
           <button
             onClick={() => window.ethereum?.request({ method: 'eth_requestAccounts' })}
             className="btn-primary"
           >
-            連接錢包
+            Connect Wallet
           </button>
         </div>
       </div>
     );
   }
 
-  // 如果已經是創作者，顯示提示訊息
+  // If already a creator, show redirect message
   if (showRedirectMessage) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -95,9 +95,9 @@ export const Join = () => {
             transition={{ duration: 0.5 }}
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8"
           >
-            <h1 className="text-3xl font-bold mb-4 text-primary-600">您已經是創作者</h1>
+            <h1 className="text-3xl font-bold mb-4 text-primary-600">You Are Already a Creator</h1>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              正在為您跳轉到收入管理頁面...
+              Redirecting to dashboard...
             </p>
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
@@ -111,7 +111,7 @@ export const Join = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!donationFactory || !account) {
-      setError('請先連接錢包');
+      setError('Please connect wallet first');
       return;
     }
 
@@ -119,7 +119,7 @@ export const Join = () => {
     setError(null);
 
     try {
-      // 先檢查是否已經是創作者
+      // Check if already a creator
       const isCreatorStatus = await donationFactory.isCreator(account);
       if (isCreatorStatus) {
         setShowRedirectMessage(true);
@@ -129,11 +129,11 @@ export const Join = () => {
         return;
       }
 
-      // 如果不是創作者，則進行註冊
+      // If not a creator, proceed with registration
       const tx = await donationFactory.registerCreator(channelImage);
       const receipt = await tx.wait();
       
-      // 從事件中獲取新合約地址
+      // Get new contract address from event
       const event = receipt.events?.find(
         (e: any) => e.event === 'DonationContractCreated'
       );
@@ -141,18 +141,18 @@ export const Join = () => {
       if (event) {
         navigate('/dashboard');
       } else {
-        setError('無法獲取合約地址');
+        setError('Unable to get contract address');
       }
     } catch (error: any) {
       console.error('Error registering creator:', error);
       if (error.message?.includes('Creator already registered')) {
-        setError('您已經註冊為創作者');
+        setError('You are already registered as a creator');
         setShowRedirectMessage(true);
         setTimeout(() => {
           navigate('/dashboard');
         }, 2000);
       } else {
-        setError(error.message || '註冊創作者時發生錯誤');
+        setError(error.message || 'Error registering as creator');
       }
     } finally {
       setIsLoading(false);
@@ -168,12 +168,12 @@ export const Join = () => {
     >
       <div className="space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-4">加入創作者</h2>
-          <p className="text-gray-600 dark:text-gray-400">成為 CreatorsHub 的創作者，開啟您的創作之旅</p>
+          <h2 className="text-3xl sm:text-4xl font-bold gradient-text mb-4">Join as Creator</h2>
+          <p className="text-gray-600 dark:text-gray-400">Become a creator on CreatorsHub and start your creative journey</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* NFT 顯示區域 */}
+          {/* NFT Display Area */}
           <div className="card p-6">
             <div className="aspect-square rounded-lg overflow-hidden mb-4">
               <img
@@ -194,13 +194,13 @@ export const Join = () => {
             </div>
           </div>
 
-          {/* 註冊表單區域 */}
+          {/* Registration Form Area */}
           <div className="card p-6">
-            <h3 className="text-xl font-semibold mb-4">創作者資訊</h3>
+            <h3 className="text-xl font-semibold mb-4">Creator Information</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  頻道封面圖片 URL *
+                  Channel Cover Image URL *
                 </label>
                 <input
                   type="url"
@@ -208,7 +208,7 @@ export const Join = () => {
                   value={channelImage}
                   onChange={(e) => setChannelImage(e.target.value)}
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="請輸入您的頻道封面圖片 URL"
+                  placeholder="Enter your channel cover image URL"
                   required
                 />
               </div>
@@ -227,10 +227,10 @@ export const Join = () => {
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    處理中...
+                    Processing...
                   </div>
                 ) : (
-                  '註冊為創作者'
+                  'Register as Creator'
                 )}
               </button>
             </form>

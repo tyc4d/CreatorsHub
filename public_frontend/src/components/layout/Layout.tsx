@@ -17,25 +17,25 @@ export const Layout = ({ children }: LayoutProps) => {
               <h1 className="text-2xl font-bold gradient-text">CreatorsHub</h1>
               <div className="hidden sm:flex space-x-6">
                 <a href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                  首頁
+                  Home
                 </a>
                 <a href="/join" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                  加入創作者
+                  Join Creator
                 </a>
                 <a href="/history" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                  交易歷史
+                  History
                 </a>
                 <a href="/gallery" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                  創作者畫廊
+                  Gallery
                 </a>
                 <a href="/qr" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                  QR 碼生成器
+                  QR Code
                 </a>
                 <a href="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                  收入管理
+                  Dashboard
                 </a>
                 <a href="/withdraw" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                  提款
+                  Withdraw
                 </a>
               </div>
             </div>
@@ -43,28 +43,28 @@ export const Layout = ({ children }: LayoutProps) => {
               <ConnectButton />
             </div>
           </div>
-          {/* 手機版導航 */}
+          {/* Mobile Navigation */}
           <div className="sm:hidden py-2 -mt-1 flex space-x-6">
             <a href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              首頁
+              Home
             </a>
             <a href="/join" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              加入創作者
+              Join Creator
             </a>
             <a href="/history" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              交易歷史
+              History
             </a>
             <a href="/gallery" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              創作者畫廊
+              Gallery
             </a>
             <a href="/qr" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              QR 碼生成器
+              QR Code
             </a>
             <a href="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              收入管理
+              Dashboard
             </a>
             <a href="/withdraw" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              提款
+              Withdraw
             </a>
           </div>
         </nav>

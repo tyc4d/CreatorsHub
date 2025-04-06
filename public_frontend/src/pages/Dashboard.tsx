@@ -34,10 +34,10 @@ const mockSourceData = [
 ];
 
 const timeRanges = [
-  { id: 'day', name: '日' },
-  { id: 'week', name: '週' },
-  { id: 'month', name: '月' },
-  { id: 'year', name: '年' },
+  { id: 'day', name: 'Day' },
+  { id: 'week', name: 'Week' },
+  { id: 'month', name: 'Month' },
+  { id: 'year', name: 'Year' },
 ];
 
 interface CreatorInfo {
@@ -50,7 +50,7 @@ interface CreatorInfo {
 export const Dashboard = () => {
   const [timeRange, setTimeRange] = useState('week');
   const [creatorInfo, setCreatorInfo] = useState<CreatorInfo>({
-    name: '數位創作者',
+    name: 'Digital Creator',
     avatar: 'https://i.pravatar.cc/150?img=3',
     youtubeChannel: 'UCxxxxxxxxxx',
     contractAddress: '0x1234...5678',
@@ -90,14 +90,14 @@ export const Dashboard = () => {
     <div className="w-full max-w-7xl mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-4xl font-bold gradient-text mb-4">
-          收入管理面板
+          Income Management Dashboard
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          追蹤和分析您的創作收入
+          Track and analyze your creation income
         </p>
       </div>
 
-      {/* 創作者資訊 */}
+      {/* Creator Info */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -123,50 +123,50 @@ export const Dashboard = () => {
           <div className="flex items-center space-x-2">
             <BiWallet className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              錢包地址：{address || '未連接'}
+              Wallet Address: {address || 'Not Connected'}
             </span>
           </div>
           <div className="flex items-center space-x-2 mt-2">
             <FaEthereum className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              贊助合約：{creatorInfo.contractAddress}
+              Donation Contract: {creatorInfo.contractAddress}
             </span>
           </div>
         </div>
       </motion.div>
 
-      {/* 統計卡片 */}
+      {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <StatCard
-          title="總收入"
+          title="Total Income"
           value={`${totalEarnings} ETH`}
           icon={<HiCurrencyDollar className="w-6 h-6 text-white" />}
           color="bg-primary-600"
         />
         <StatCard
-          title="本月收入"
+          title="This Month"
           value={`${thisMonthEarnings} ETH`}
           icon={<FaEthereum className="w-6 h-6 text-white" />}
           color="bg-green-500"
         />
         <StatCard
-          title="支持者數量"
+          title="Supporters"
           value={supporterCount}
           icon={<BiWallet className="w-6 h-6 text-white" />}
           color="bg-purple-500"
         />
       </div>
 
-      {/* 圖表區域 */}
+      {/* Charts Area */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* 收入趨勢圖 */}
+        {/* Income Trend Chart */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
         >
           <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-4">收入趨勢</h3>
+            <h3 className="text-xl font-semibold mb-4">Income Trend</h3>
             <div className="flex space-x-2">
               {timeRanges.map((range) => (
                 <button
@@ -190,18 +190,18 @@ export const Dashboard = () => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="amount" name="收入 (ETH)" fill="#6366f1" />
+              <Bar dataKey="amount" name="Income (ETH)" fill="#6366f1" />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
 
-        {/* 收入來源分布 */}
+        {/* Income Source Distribution */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
         >
-          <h3 className="text-xl font-semibold mb-6">收入來源分布</h3>
+          <h3 className="text-xl font-semibold mb-6">Income Source Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
